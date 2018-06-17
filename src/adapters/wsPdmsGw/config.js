@@ -4,8 +4,8 @@
 module.exports = {
     wsPdmsGw: {
         topics: {
-            inbound: [],
-            outbound: []
+            inbound: [], // The list of inbound NATS topic names
+            outbound: [] // The list of outbound NATS topic names
         }
     }
 }

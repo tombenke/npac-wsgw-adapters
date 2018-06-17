@@ -27,7 +27,7 @@
     "url": "http://github.com/tombenke/npac-wsgw-adapters.git"
   },
   "bin": {},
-  "main": "index",
+  "main": "dist/index",
   "dependencies": {
     "datafile": "3.2.0",
     "lodash": "4.17.4",

@@ -12,8 +12,8 @@ Adapter modules for websocket servers and websocket-NATS gateways
 
 This project contains the following  [wsgw](https://github.com/tombenke/wsgw) adapters:
 
-- [`wServer`](src/adapters/wsServer/), a WebSocket server adapter,
-- [`wPdmsGw`](src/adapters/wsPdmsGw/), a WebSocket <-> NATS gateway,
+- [`wsServer`](src/adapters/wsServer/), a WebSocket server adapter,
+- [`wsPdmsGw`](src/adapters/wsPdmsGw/), a WebSocket <-> NATS gateway,
 - [`webServer`](src/adapters/webServer/), a very simple, for testing purposes only.
 
 See [wsgw](https://github.com/tombenke/wsgw) project for details.
