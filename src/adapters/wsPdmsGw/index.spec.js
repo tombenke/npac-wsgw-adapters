@@ -83,5 +83,5 @@ describe('wsPdmsGw', () => {
         }
 
         npacStart(adapters, [testJob], terminators)
-    }).timeout(10000)
+    }).timeout(30000)
 })
