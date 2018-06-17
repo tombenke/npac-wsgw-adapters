@@ -1,0 +1,27 @@
+tmp
+coverage
+node_modules
+examples/private
+examples/*/node_modules
+examples/*/*/node_modules
+templates/docs/.sass-cache
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
+
+# Netbeans
+nb-configuration.xml

@@ -1,0 +1,89 @@
+'use strict';
+
+var _npac = require('npac');
+
+var _npac2 = _interopRequireDefault(_npac);
+
+var _chai = require('chai');
+
+var _sinon = require('sinon');
+
+var _sinon2 = _interopRequireDefault(_sinon);
+
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _config = require('./config');
+
+var _config2 = _interopRequireDefault(_config);
+
+var _npacPdmsHemeraAdapter = require('npac-pdms-hemera-adapter');
+
+var _npacPdmsHemeraAdapter2 = _interopRequireDefault(_npacPdmsHemeraAdapter);
+
+var _webServer = require('../webServer/');
+
+var _webServer2 = _interopRequireDefault(_webServer);
+
+var _index = require('./index');
+
+var _index2 = _interopRequireDefault(_index);
+
+var _datafile = require('datafile');
+
+var _npacUtils = require('../npacUtils');
+
+var _socket = require('socket.io-client');
+
+var _socket2 = _interopRequireDefault(_socket);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+describe('wsServer', function () {
+    var sandbox = void 0;
+
+    beforeEach(function (done) {
+        (0, _npacUtils.removeSignalHandlers)();
+        sandbox = _sinon2.default.sandbox.create({});
+        done();
+    });
+
+    afterEach(function (done) {
+        (0, _npacUtils.removeSignalHandlers)();
+        sandbox.restore();
+        done();
+    });
+
+    var config = _lodash2.default.merge({}, _config2.default, _webServer2.default.defaults, _lodash2.default.setWith({}, 'wsServer.forwardTopics', true));
+    console.log(config);
+    var adapters = [_npac2.default.mergeConfig(config), _npac2.default.addLogger, _npacPdmsHemeraAdapter2.default.startup, _webServer2.default.startup, _index2.default.startup];
+
+    var terminators = [_index2.default.shutdown, _webServer2.default.shutdown, _npacPdmsHemeraAdapter2.default.shutdown];
+
+    it('message sending loopback', function (done) {
+
+        (0, _npacUtils.catchExitSignals)(sandbox, done);
+
+        var testJob = function testJob(container, next) {
+            var serverUri = 'http://localhost:' + config.webServer.port;
+            var message = { topic: 'XYZ', data: 'data' };
+            var clientProducer = (0, _socket2.default)(serverUri);
+            var clientConsumer = (0, _socket2.default)(serverUri);
+
+            // Subscribe to the 'XYZ' channel to catch the loopback response
+            clientConsumer.on(message.topic, function (data) {
+                console.log('data arrived: ', data);
+                (0, _chai.expect)(data).to.eql(message);
+                clientProducer.close();
+                clientConsumer.close();
+                next(null, null);
+            });
+
+            // Send a message with topic: 'XYZ', that will be forwarded to the 'XYZ' channel
+            clientProducer.emit('message', message);
+        };
+
+        (0, _npacUtils.npacStart)(adapters, [testJob], terminators);
+    }).timeout(10000);
+});
