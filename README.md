@@ -10,6 +10,12 @@ npac-wsgw-adapters
 
 Adapter modules for websocket servers and websocket-NATS gateways
 
+This project contains the following  [wsgw](https://github.com/tombenke/wsgw) adapters:
+
+- [`wServer`](src/adapters/wsServer/), a WebSocket server adapter,
+- [`wPdmsGw`](src/adapters/wsPdmsGw/), a WebSocket <-> NATS gateway,
+- [`webServer`](src/adapters/webServer/), a very simple, for testing purposes only.
+
 See [wsgw](https://github.com/tombenke/wsgw) project for details.
 
 ## Installation
@@ -20,22 +26,53 @@ Run the install command:
 
 ## Configuration
 
-This module uses the `config.wsPdmsGw` property to gain its configuration parameters.
+### The config parameters of the `wsServer` adapter
 
-The default parameters can be found in [`src/config.js`](src/config.js):
+This module uses the `config.wsServer` property to gain its configuration parameters.
 
-```JSON
-{
-    wsPdmsGw: {
-        inbound: [], // The list of inbound NATS topic names
-        outbound: [] // The list of outbound NATS topic names
+The default parameters can be found in [`src/adapters/wsServer/config.js`](src/adapters/wsServer/config.js):
+
+```JavaScript
+    {
+        wsServer: {
+            // The name of the event, where the WebSocket messages will be sent for forwarding
+            // The messages should have a `topic` property,
+            // that holds the name of the WebSocket event in case of inbound messages,
+            // or the name of the NATS topic in case of the outbound messages.
+            forwarderEvent: process.env.WSGW_SERVER_FORWARDER_EVENT || 'message',
+
+            // If true, the WebSocket server will forward the messages to the target topic
+            forwardTopics: process.env.WSGW_SERVER_FORWARD_TOPICS || false
+        }
     }
-}
 ```
 
-## Get Help
+### The config parameters of the `wsPdmsGw` adapter
 
-To learn more about the tool visit the [homepage](http://tombenke.github.io/npac-wsgw-adapters/api/).
+This module uses the `config.wsPdmsGw` property to gain its configuration parameters.
+
+The default parameters can be found in [`src/adapters/wsPdmsGw/config.js`](src/adapters/wsPdmsGw/config.js):
+
+```JavaScript
+    {
+        wsPdmsGw: {
+            inbound: [], // The list of inbound NATS topic names
+            outbound: [] // The list of outbound NATS topic names
+        }
+    }
+```
+
+### The config parameters of the `webServer` adapter
+
+This module uses the `config.webServer` property to gain its configuration parameters.
+
+The default parameters can be found in [`src/adapters/webServer/config.js`](src/adapters/webServer/config.js):
+
+```JavaScript
+    webServer: {
+        port: process.env.WSGW_SERVER_PORT || 8001 // The port where the WebSocket server will listen
+    }
+```
 
 ## References
 
@@ -43,9 +80,6 @@ To learn more about the tool visit the [homepage](http://tombenke.github.io/npac
 - [npac](http://tombenke.github.io/npac)
 
 ---
-
-This project was generated from the [ncli-archetype](https://github.com/tombenke/ncli-archetype)
-project archetype, using the [kickoff](https://github.com/tombenke/kickoff) utility.
 
 [npm-badge]: https://badge.fury.io/js/npac-wsgw-adapters.svg
 [npm-url]: https://badge.fury.io/js/npac-wsgw-adapters
