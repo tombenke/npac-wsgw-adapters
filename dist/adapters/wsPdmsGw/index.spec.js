@@ -104,5 +104,5 @@ describe('wsPdmsGw', function () {
         };
 
         (0, _npacUtils.npacStart)(adapters, [testJob], terminators);
-    }).timeout(10000);
+    }).timeout(30000);
 });

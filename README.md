@@ -39,10 +39,10 @@ The default parameters can be found in [`src/adapters/wsServer/config.js`](src/a
             // The messages should have a `topic` property,
             // that holds the name of the WebSocket event in case of inbound messages,
             // or the name of the NATS topic in case of the outbound messages.
-            forwarderEvent: process.env.WSGW_SERVER_FORWARDER_EVENT || 'message',
+            forwarderEvent: process.env.WSSERVER_FORWARDER_EVENT || 'message',
 
             // If true, the WebSocket server will forward the messages to the target topic
-            forwardTopics: process.env.WSGW_SERVER_FORWARD_TOPICS || false
+            forwardTopics: process.env.WSSERVER_FORWARD_TOPICS || false
         }
     }
 ```
@@ -62,6 +62,11 @@ The default parameters can be found in [`src/adapters/wsPdmsGw/config.js`](src/a
     }
 ```
 
+These configuration parameters can be defined via environment variables as a comma-separated list:
+- `WSPDMSGW_INBOUND_TOPICS`: list of inbound topics, for example: "IN1, IN2, IN3",
+- `WSPDMSGW_INBOUND_TOPICS`: list of outbound topics, for example: "OUT1,OUT2".
+
+
 ### The config parameters of the `webServer` adapter
 
 This module uses the `config.webServer` property to gain its configuration parameters.
@@ -70,7 +75,7 @@ The default parameters can be found in [`src/adapters/webServer/config.js`](src/
 
 ```JavaScript
     webServer: {
-        port: process.env.WSGW_SERVER_PORT || 8001 // The port where the WebSocket server will listen
+        port: process.env.WEBSERVER_PORT || 8001 // The port where the WebSocket server will listen
     }
 ```
 
