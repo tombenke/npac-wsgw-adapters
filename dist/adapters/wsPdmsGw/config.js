@@ -22,7 +22,7 @@ module.exports = {
             inbound: getTopicArray(process.env.WSPDMSGW_INBOUND_TOPICS),
 
             // The list of outbound NATS topic names
-            outbound: getTopicArray(process.env.WSPDMSGW_INBOUND_TOPICS)
+            outbound: getTopicArray(process.env.WSPDMSGW_OUTBOUND_TOPICS)
         }
     }
 };

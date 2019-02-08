@@ -16,7 +16,9 @@ This project contains the following  [wsgw](https://github.com/tombenke/wsgw) ad
 - [`wsPdmsGw`](src/adapters/wsPdmsGw/), a WebSocket <-> NATS gateway,
 - [`webServer`](src/adapters/webServer/), a very simple, for testing purposes only.
 
-See [wsgw](https://github.com/tombenke/wsgw) project for details.
+See [wsgw](https://github.com/tombenke/wsgw) project for details about how it is working.
+In case you need a web server with WebSocket that also includes these adapters,
+and provides the NATS gateway functionality as well, then use [easer](https://www.npmjs.com/package/easer).
 
 ## Installation
 
