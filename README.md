@@ -1,24 +1,24 @@
 npac-wsgw-adapters
 ==================
 
-[![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
+[![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges)
 [![npm version][npm-badge]][npm-url]
 [![Build Status][travis-badge]][travis-url]
 [![Coveralls][BadgeCoveralls]][Coveralls]
 
 ## About
 
-Adapter modules for websocket servers and websocket-NATS gateways
-
-This project contains the following  [wsgw](https://github.com/tombenke/wsgw) adapters:
+This repository holds the following [npac](http://tombenke.github.io/npac) adapter modules for websocket servers and websocket-NATS gateways:
 
 - [`wsServer`](src/adapters/wsServer/), a WebSocket server adapter,
-- [`wsPdmsGw`](src/adapters/wsPdmsGw/), a WebSocket <-> NATS gateway,
-- [`webServer`](src/adapters/webServer/), a very simple, for testing purposes only.
+- [`wsPdmsGw`](src/adapters/wsPdmsGw/), a WebSocket <-> NATS gateway.
 
-See [wsgw](https://github.com/tombenke/wsgw) project for details about how it is working.
-In case you need a web server with WebSocket that also includes these adapters,
-and provides the NATS gateway functionality as well, then use [easer](https://www.npmjs.com/package/easer).
+These adapters are the main parts of the [wsgw](https://github.com/tombenke/wsgw) WebSocket server and client application that has built-in NATS gateway functionality. See [wsgw](https://github.com/tombenke/wsgw) project for details about how it is working.
+
+You can add these adapters to your [npac](http://tombenke.github.io/npac)-based application, but in case you need an off-the-shelf web server with WebSocket that also includes these adapters,and provides the NATS gateway functionality as well, then use [easer](https://www.npmjs.com/package/easer) instead.
+
+The applications that use these adapters, also needs to [npac-pdms-hemera-adapter](https://github.com/tombenke/npac-pdms-hemera-adapter) and [npac-webserver-adapter](https://github.com/tombenke/npac-webserver-adapter/) adapters added to the application container.
+
 
 ## Installation
 
@@ -73,11 +73,11 @@ These configuration parameters can be defined via environment variables as a com
 
 This module uses the `config.webServer` property to gain its configuration parameters.
 
-The default parameters can be found in [`src/adapters/webServer/config.js`](src/adapters/webServer/config.js):
+The default parameters can be found in the [`config.js`](https://github.com/tombenke/npac-webserver-adapter/blob/master/src/config.js) file of the [npac-webserver-adapter](https://github.com/tombenke/npac-webserver-adapter/) adapter.
 
 ```JavaScript
     webServer: {
-        port: process.env.WEBSERVER_PORT || 8001 // The port where the WebSocket server will listen
+        port: process.env.WEBSERVER_PORT || 8080 // The port where the WebSocket server will listen
     }
 ```
 
@@ -85,6 +85,8 @@ The default parameters can be found in [`src/adapters/webServer/config.js`](src/
 
 - [wsgw](https://github.com/tombenke/wsgw)
 - [npac](http://tombenke.github.io/npac)
+- [npac-pdms-hemera-adapter](https://github.com/tombenke/npac-pdms-hemera-adapter)
+- [npac-webserver-adapter](https://github.com/tombenke/npac-webserver-adapter/)
 
 ---
 
