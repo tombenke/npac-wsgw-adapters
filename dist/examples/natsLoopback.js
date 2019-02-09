@@ -24,7 +24,7 @@ var registerLoopback = function registerLoopback(hemera, outboundTopic, inboundT
 
     console.log('register loopback [wsgw] >> [' + outboundTopic + '] >> lbFun() >> [' + inboundTopic + '] >> [wsgw]');
     hemera.add({ pubsub$: true, topic: outboundTopic }, function (data) {
-        var msgToForward = _lodash2.default.merge({}, lbFun(data), { 'pubsub$': true, topic: inboundTopic });
+        var msgToForward = _lodash2.default.merge({}, lbFun(data), { pubsub$: true, topic: inboundTopic });
         console.log('Forward from WS(' + outboundTopic + ') data: ' + JSON.stringify(msgToForward) + ' to NATS(' + inboundTopic + ')');
         hemera.act(msgToForward);
     });

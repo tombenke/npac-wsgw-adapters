@@ -5,7 +5,7 @@ import _ from 'lodash'
 const registerLoopback = (hemera, outboundTopic, inboundTopic, lbFun = _.identity) => {
     console.log(`register loopback [wsgw] >> [${outboundTopic}] >> lbFun() >> [${inboundTopic}] >> [wsgw]`)
     hemera.add({ pubsub$: true, topic: outboundTopic }, data => {
-        const msgToForward = _.merge({}, lbFun(data), {'pubsub$': true, topic: inboundTopic})
+        const msgToForward = _.merge({}, lbFun(data), { pubsub$: true, topic: inboundTopic })
         console.log(`Forward from WS(${outboundTopic}) data: ${JSON.stringify(msgToForward)} to NATS(${inboundTopic})`)
         hemera.act(msgToForward)
     })

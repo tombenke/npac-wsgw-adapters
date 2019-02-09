@@ -5,7 +5,6 @@ var _chai = require('chai');
 var _index = require('./index');
 
 describe('app', function () {
-
     it('#wsServer', function (done) {
         console.log(_index.wsServer, _index.wsPdmsGw);
         (0, _chai.expect)(_index.wsServer.defaults.wsServer.forwarderEvent).to.equal('message');

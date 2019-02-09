@@ -1,4 +1,3 @@
-import npac from 'npac'
 import { expect } from 'chai'
 import sinon from 'sinon'
 import _ from 'lodash'
@@ -7,7 +6,7 @@ import pdms from 'npac-pdms-hemera-adapter'
 import webServer from 'npac-webserver-adapter'
 import wsServer from './index'
 import { findFilesSync, mergeJsonFilesSync } from 'datafile'
-import { removeSignalHandlers, catchExitSignals, npacStart } from '../npacUtils'
+import { addLogger, mergeConfig, removeSignalHandlers, catchExitSignals, npacStart } from 'npac'
 import io from 'socket.io-client'
 
 describe('wsServer', () => {
@@ -27,22 +26,11 @@ describe('wsServer', () => {
 
     const config = _.merge({}, defaults, webServer.defaults, _.setWith({}, 'wsServer.forwardTopics', true))
     console.log(config)
-    const adapters = [
-        npac.mergeConfig(config),
-        npac.addLogger,
-        pdms.startup,
-        webServer.startup,
-        wsServer.startup
-    ]
+    const adapters = [mergeConfig(config), addLogger, pdms.startup, webServer.startup, wsServer.startup]
 
-    const terminators = [
-        wsServer.shutdown,
-        webServer.shutdown,
-        pdms.shutdown
-    ]
+    const terminators = [wsServer.shutdown, webServer.shutdown, pdms.shutdown]
 
-    it('message sending loopback', (done) => {
-
+    it('message sending loopback', done => {
         catchExitSignals(sandbox, done)
 
         const testJob = (container, next) => {
@@ -52,7 +40,7 @@ describe('wsServer', () => {
             const clientConsumer = io(serverUri)
 
             // Subscribe to the 'XYZ' channel to catch the loopback response
-            clientConsumer.on(message.topic, function (data) {
+            clientConsumer.on(message.topic, function(data) {
                 console.log('data arrived: ', data)
                 expect(data).to.eql(message)
                 clientProducer.close()

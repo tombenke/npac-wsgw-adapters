@@ -2,8 +2,7 @@ import { expect } from 'chai'
 import { wsServer, wsPdmsGw } from './index'
 
 describe('app', () => {
-
-    it('#wsServer', (done) => {
+    it('#wsServer', done => {
         console.log(wsServer, wsPdmsGw)
         expect(wsServer.defaults.wsServer.forwarderEvent).to.equal('message')
         expect(wsServer.defaults.wsServer.forwardTopics).to.equal(false)
@@ -14,7 +13,7 @@ describe('app', () => {
         done()
     })
 
-    it('#wsPdmsGw', (done) => {
+    it('#wsPdmsGw', done => {
         console.log(wsServer, wsPdmsGw)
         expect(wsPdmsGw.defaults.wsPdmsGw.topics.inbound).to.be.an('array')
         expect(wsPdmsGw.defaults.wsPdmsGw.topics.outbound).to.be.an('array')

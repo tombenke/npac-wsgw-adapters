@@ -16,7 +16,6 @@ after(function (done) {
 });
 
 describe('wsServer.config', function () {
-
     it('#defaults', function (done) {
         var expected = {
             wsServer: {

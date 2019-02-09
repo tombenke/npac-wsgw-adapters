@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*jshint node: true */
-'use strict';
+'use strict'
 
 import http from 'http'
 import SocketIo from 'socket.io'
@@ -30,9 +30,9 @@ const startup = (container, next) => {
     //const io = SocketIo(httpServer)
     const io = SocketIo(container.webServer.server)
 
-    io.on('connection', function (socket) {
+    io.on('connection', function(socket) {
         container.logger.info('Client connected')
-        socket.on(forwarderEvent, function (data, confirmCb) {
+        socket.on(forwarderEvent, function(data, confirmCb) {
             const targetEv = serviceConfig.wsServer.forwardTopics ? data.topic : forwarderEvent
             container.logger.info(`[${forwarderEvent}] >> ${JSON.stringify(data)} >> [${targetEv}]`)
             socket.broadcast.emit(targetEv, data)
@@ -41,7 +41,7 @@ const startup = (container, next) => {
             }
         })
     })
-    io.on('error', function (err) {
+    io.on('error', function(err) {
         container.logger.error('Server ERROR:', err)
     })
     io.on('disconnection', reason => {
@@ -70,8 +70,8 @@ const startup = (container, next) => {
  * @function
  */
 const shutdown = (container, next) => {
-    container.logger.info("Shut down wsServer adapter")
-    container.wsServer.server.close((err) => next(err, null))
+    container.logger.info('Shut down wsServer adapter')
+    container.wsServer.server.close(err => next(err, null))
 }
 
 module.exports = {

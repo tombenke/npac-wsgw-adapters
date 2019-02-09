@@ -7,7 +7,7 @@ var _lodash2 = _interopRequireDefault(_lodash);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var getTopicArray = function getTopicArray(topicList) {
-    return _lodash2.default.isUndefined(topicList) || !_lodash2.default.isString(topicList) ? [] : topicList === "" ? [] : _lodash2.default.map(topicList.split(','), function (t) {
+    return _lodash2.default.isUndefined(topicList) || !_lodash2.default.isString(topicList) ? [] : topicList === '' ? [] : _lodash2.default.map(topicList.split(','), function (t) {
         return t.trim();
     });
 };

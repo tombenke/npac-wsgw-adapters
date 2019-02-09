@@ -28,7 +28,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var setupInboundTopic = function setupInboundTopic(container, wsClient) {
     return function (topic) {
         // TODO: implement shutdown and enable reconnect.
-        if (_lodash2.default.isString(topic) && topic !== "") {
+        if (_lodash2.default.isString(topic) && topic !== '') {
             container.logger.info('Setup observer to inbound NATS "' + topic + '" topic.');
             container.pdms.add({ pubsub$: true, topic: topic }, function (data) {
                 container.logger.info('Forward from NATS(' + topic + ') data: ' + JSON.stringify(data) + ' to WS(' + topic + ')');
@@ -41,7 +41,7 @@ var setupInboundTopic = function setupInboundTopic(container, wsClient) {
 /**
  * Setup an outbound topic
  *
- * Setup a websocket client to observe the `<topic>` named events, then publish them to the 
+ * Setup a websocket client to observe the `<topic>` named events, then publish them to the
  * NATS topic with the same name.
  *
  * @arg {Object} container  - The container object
@@ -52,10 +52,10 @@ var setupInboundTopic = function setupInboundTopic(container, wsClient) {
 var setupOutboundTopic = function setupOutboundTopic(container, wsClient) {
     return function (topic) {
         // TODO: implement shutdown and enable reconnect.
-        if (_lodash2.default.isString(topic) && topic != "") {
+        if (_lodash2.default.isString(topic) && topic != '') {
             container.logger.info('Setup producer of outbound NATS "' + topic + '" topic.');
             wsClient.on(topic, function (data) {
-                var msgToForward = _lodash2.default.merge({}, data, { 'pubsub$': true, topic: topic });
+                var msgToForward = _lodash2.default.merge({}, data, { pubsub$: true, topic: topic });
                 container.logger.info('Forward from WS(' + topic + ') data: ' + JSON.stringify(msgToForward) + ' to NATS(' + topic + ')');
                 container.pdms.act(msgToForward);
             });
@@ -132,7 +132,7 @@ var startup = function startup(container, next) {
  * @function
  */
 var shutdown = function shutdown(container, next) {
-    container.logger.info("Shut down wsPdmsGw adapter");
+    container.logger.info('Shut down wsPdmsGw adapter');
     container.wsPdmsGw.wsClient.close();
     next(null, null);
 };

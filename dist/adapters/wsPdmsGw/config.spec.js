@@ -16,7 +16,6 @@ after(function (done) {
 });
 
 describe('wsPdmsGw.config', function () {
-
     it('#defaults', function (done) {
         var expected = {
             wsPdmsGw: {

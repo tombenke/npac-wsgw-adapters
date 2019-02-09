@@ -1,9 +1,5 @@
 'use strict';
 
-var _npac = require('npac');
-
-var _npac2 = _interopRequireDefault(_npac);
-
 var _chai = require('chai');
 
 var _sinon = require('sinon');
@@ -22,9 +18,9 @@ var _npacPdmsHemeraAdapter = require('npac-pdms-hemera-adapter');
 
 var _npacPdmsHemeraAdapter2 = _interopRequireDefault(_npacPdmsHemeraAdapter);
 
-var _webServer = require('../webServer/');
+var _npacWebserverAdapter = require('npac-webserver-adapter');
 
-var _webServer2 = _interopRequireDefault(_webServer);
+var _npacWebserverAdapter2 = _interopRequireDefault(_npacWebserverAdapter);
 
 var _index = require('./index');
 
@@ -32,7 +28,7 @@ var _index2 = _interopRequireDefault(_index);
 
 var _datafile = require('datafile');
 
-var _npacUtils = require('../npacUtils');
+var _npac = require('npac');
 
 var _socket = require('socket.io-client');
 
@@ -44,26 +40,25 @@ describe('wsServer', function () {
     var sandbox = void 0;
 
     beforeEach(function (done) {
-        (0, _npacUtils.removeSignalHandlers)();
+        (0, _npac.removeSignalHandlers)();
         sandbox = _sinon2.default.sandbox.create({});
         done();
     });
 
     afterEach(function (done) {
-        (0, _npacUtils.removeSignalHandlers)();
+        (0, _npac.removeSignalHandlers)();
         sandbox.restore();
         done();
     });
 
-    var config = _lodash2.default.merge({}, _config2.default, _webServer2.default.defaults, _lodash2.default.setWith({}, 'wsServer.forwardTopics', true));
+    var config = _lodash2.default.merge({}, _config2.default, _npacWebserverAdapter2.default.defaults, _lodash2.default.setWith({}, 'wsServer.forwardTopics', true));
     console.log(config);
-    var adapters = [_npac2.default.mergeConfig(config), _npac2.default.addLogger, _npacPdmsHemeraAdapter2.default.startup, _webServer2.default.startup, _index2.default.startup];
+    var adapters = [(0, _npac.mergeConfig)(config), _npac.addLogger, _npacPdmsHemeraAdapter2.default.startup, _npacWebserverAdapter2.default.startup, _index2.default.startup];
 
-    var terminators = [_index2.default.shutdown, _webServer2.default.shutdown, _npacPdmsHemeraAdapter2.default.shutdown];
+    var terminators = [_index2.default.shutdown, _npacWebserverAdapter2.default.shutdown, _npacPdmsHemeraAdapter2.default.shutdown];
 
     it('message sending loopback', function (done) {
-
-        (0, _npacUtils.catchExitSignals)(sandbox, done);
+        (0, _npac.catchExitSignals)(sandbox, done);
 
         var testJob = function testJob(container, next) {
             var serverUri = 'http://localhost:' + config.webServer.port;
@@ -84,6 +79,6 @@ describe('wsServer', function () {
             clientProducer.emit('message', message);
         };
 
-        (0, _npacUtils.npacStart)(adapters, [testJob], terminators);
+        (0, _npac.npacStart)(adapters, [testJob], terminators);
     }).timeout(10000);
 });

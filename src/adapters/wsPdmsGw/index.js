@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*jshint node: true */
-'use strict';
+'use strict'
 
 import ioClient from 'socket.io-client'
 import defaults from './config'
@@ -16,7 +16,7 @@ import _ from 'lodash'
  */
 const setupInboundTopic = (container, wsClient) => topic => {
     // TODO: implement shutdown and enable reconnect.
-    if (_.isString(topic) && topic !== "") {
+    if (_.isString(topic) && topic !== '') {
         container.logger.info(`Setup observer to inbound NATS "${topic}" topic.`)
         container.pdms.add({ pubsub$: true, topic: topic }, data => {
             container.logger.info(`Forward from NATS(${topic}) data: ${JSON.stringify(data)} to WS(${topic})`)
@@ -28,7 +28,7 @@ const setupInboundTopic = (container, wsClient) => topic => {
 /**
  * Setup an outbound topic
  *
- * Setup a websocket client to observe the `<topic>` named events, then publish them to the 
+ * Setup a websocket client to observe the `<topic>` named events, then publish them to the
  * NATS topic with the same name.
  *
  * @arg {Object} container  - The container object
@@ -38,13 +38,13 @@ const setupInboundTopic = (container, wsClient) => topic => {
  */
 const setupOutboundTopic = (container, wsClient) => topic => {
     // TODO: implement shutdown and enable reconnect.
-    if (_.isString(topic) && topic != "") {
+    if (_.isString(topic) && topic != '') {
         container.logger.info(`Setup producer of outbound NATS "${topic}" topic.`)
-        wsClient.on(topic, function (data) {
-                const msgToForward = _.merge({}, data, {'pubsub$': true, topic: topic})
-                container.logger.info(`Forward from WS(${topic}) data: ${JSON.stringify(msgToForward)} to NATS(${topic})`)
-                container.pdms.act(msgToForward)
-            })
+        wsClient.on(topic, function(data) {
+            const msgToForward = _.merge({}, data, { pubsub$: true, topic: topic })
+            container.logger.info(`Forward from WS(${topic}) data: ${JSON.stringify(msgToForward)} to NATS(${topic})`)
+            container.pdms.act(msgToForward)
+        })
     }
 }
 
@@ -117,7 +117,7 @@ const startup = (container, next) => {
  * @function
  */
 const shutdown = (container, next) => {
-    container.logger.info("Shut down wsPdmsGw adapter")
+    container.logger.info('Shut down wsPdmsGw adapter')
     container.wsPdmsGw.wsClient.close()
     next(null, null)
 }
