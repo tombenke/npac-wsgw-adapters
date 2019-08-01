@@ -26,10 +26,16 @@ describe('wsPdmsGw', () => {
         done()
     })
 
+    const webServerConfig = _.merge({}, webServer.defaults, {
+            webServer: {
+                restApiPath: __dirname + '../../../fixtures/api.yml'
+            }
+        })
+
     const config = _.merge(
         {},
         defaults,
-        webServer.defaults,
+        webServerConfig,
         wsServerConfig,
         _.setWith({}, 'wsServer.forwardTopics', true),
         _.setWith({}, 'wsPdmsGw.topics.inbound', ['IN']),

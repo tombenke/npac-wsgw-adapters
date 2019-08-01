@@ -1,0 +1,30 @@
+swagger: "2.0"
+
+info: 
+  title: Dummy REST API
+  description: A minimalistic REST API specification for testing purposes
+  version: "1.0"
+  contact: 
+    name: dummy
+    url: "https://github.com/tombenke/npac-wsgw-adapters/"
+    email: "tombenke@gmail.com"
+
+schemes:
+  - http
+
+consumes: []
+produces:
+  - application/json
+
+host: localhost
+basePath: /
+
+tags: 
+  - name: non-static
+    description: These endpoints are non-static ones
+
+  - name: static
+    description: These are static endpoints
+
+paths: {}
+

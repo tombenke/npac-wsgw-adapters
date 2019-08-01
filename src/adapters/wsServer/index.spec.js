@@ -24,7 +24,12 @@ describe('wsServer', () => {
         done()
     })
 
-    const config = _.merge({}, defaults, webServer.defaults, _.setWith({}, 'wsServer.forwardTopics', true))
+    const webServerConfig = _.merge({}, webServer.defaults, {
+            webServer: {
+                restApiPath: __dirname + '../../../fixtures/api.yml'
+            }
+        })
+    const config = _.merge({}, defaults, webServerConfig, _.setWith({}, 'wsServer.forwardTopics', true))
     console.log(config)
     const adapters = [mergeConfig(config), addLogger, pdms.startup, webServer.startup, wsServer.startup]
 

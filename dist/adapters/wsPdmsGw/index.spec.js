@@ -59,7 +59,13 @@ describe('wsPdmsGw', function () {
         done();
     });
 
-    var config = _lodash2.default.merge({}, _config2.default, _npacWebserverAdapter2.default.defaults, _config4.default, _lodash2.default.setWith({}, 'wsServer.forwardTopics', true), _lodash2.default.setWith({}, 'wsPdmsGw.topics.inbound', ['IN']), _lodash2.default.setWith({}, 'wsPdmsGw.topics.outbound', ['OUT']));
+    var webServerConfig = _lodash2.default.merge({}, _npacWebserverAdapter2.default.defaults, {
+        webServer: {
+            restApiPath: __dirname + '../../../fixtures/api.yml'
+        }
+    });
+
+    var config = _lodash2.default.merge({}, _config2.default, webServerConfig, _config4.default, _lodash2.default.setWith({}, 'wsServer.forwardTopics', true), _lodash2.default.setWith({}, 'wsPdmsGw.topics.inbound', ['IN']), _lodash2.default.setWith({}, 'wsPdmsGw.topics.outbound', ['OUT']));
 
     var adapters = [(0, _npac.mergeConfig)(config), _npac.addLogger, _npacPdmsHemeraAdapter2.default.startup, _npacWebserverAdapter2.default.startup, _wsServer2.default.startup, _index2.default.startup];
 
