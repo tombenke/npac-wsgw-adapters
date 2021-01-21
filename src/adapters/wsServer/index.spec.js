@@ -10,11 +10,10 @@ import { addLogger, mergeConfig, removeSignalHandlers, catchExitSignals, npacSta
 import io from 'socket.io-client'
 
 describe('wsServer', () => {
-    let sandbox
+    let sandbox = sinon
 
     beforeEach(done => {
         removeSignalHandlers()
-        sandbox = sinon.sandbox.create({})
         done()
     })
 
@@ -25,10 +24,10 @@ describe('wsServer', () => {
     })
 
     const webServerConfig = _.merge({}, webServer.defaults, {
-            webServer: {
-                restApiPath: __dirname + '../../../fixtures/api.yml'
-            }
-        })
+        webServer: {
+            restApiPath: __dirname + '../../../fixtures/api.yml'
+        }
+    })
     const config = _.merge({}, defaults, webServerConfig, _.setWith({}, 'wsServer.forwardTopics', true))
     console.log(config)
     const adapters = [mergeConfig(config), addLogger, pdms.startup, webServer.startup, wsServer.startup]
