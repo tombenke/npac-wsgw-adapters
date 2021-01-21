@@ -29,11 +29,13 @@
   "bin": {},
   "main": "dist/index",
   "dependencies": {
+    "@types/socket.io-client": "^1.4.35",
     "datafile": "^3.4.1",
     "lodash": "^4.17.20",
     "npac": "^2.1.8",
     "npac-pdms-hemera-adapter": "^1.4.8",
-    "socket.io": "^2.3.0"
+    "socket.io": "^3.1.0",
+    "socket.io-client": "^3.1.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
