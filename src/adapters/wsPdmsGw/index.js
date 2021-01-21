@@ -14,11 +14,11 @@ import _ from 'lodash'
  *
  * @function
  */
-const setupInboundTopic = (container, wsClient) => topic => {
+const setupInboundTopic = (container, wsClient) => (topic) => {
     // TODO: implement shutdown and enable reconnect.
     if (_.isString(topic) && topic !== '') {
         container.logger.info(`Setup observer to inbound NATS "${topic}" topic.`)
-        container.pdms.add({ pubsub$: true, topic: topic }, data => {
+        container.pdms.add({ pubsub$: true, topic: topic }, (data) => {
             container.logger.info(`Forward from NATS(${topic}) data: ${JSON.stringify(data)} to WS(${topic})`)
             wsClient.emit('message', data)
         })
@@ -36,11 +36,11 @@ const setupInboundTopic = (container, wsClient) => topic => {
  *
  * @function
  */
-const setupOutboundTopic = (container, wsClient) => topic => {
+const setupOutboundTopic = (container, wsClient) => (topic) => {
     // TODO: implement shutdown and enable reconnect.
     if (_.isString(topic) && topic != '') {
         container.logger.info(`Setup producer of outbound NATS "${topic}" topic.`)
-        wsClient.on(topic, function(data) {
+        wsClient.on(topic, function (data) {
             const msgToForward = _.merge({}, data, { pubsub$: true, topic: topic })
             container.logger.info(`Forward from WS(${topic}) data: ${JSON.stringify(msgToForward)} to NATS(${topic})`)
             container.pdms.act(msgToForward)

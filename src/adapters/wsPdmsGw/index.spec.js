@@ -14,12 +14,12 @@ import io from 'socket.io-client'
 describe('wsPdmsGw', () => {
     let sandbox = sinon
 
-    beforeEach(done => {
+    beforeEach((done) => {
         removeSignalHandlers()
         done()
     })
 
-    afterEach(done => {
+    afterEach((done) => {
         removeSignalHandlers()
         sandbox.restore()
         done()
@@ -53,7 +53,7 @@ describe('wsPdmsGw', () => {
     const terminators = [wsPdmsGw.shutdown, wsServer.shutdown, webServer.shutdown, pdms.shutdown]
 
     const setupPdmsShortCircuit = (container, inTopic, outTopic) => {
-        container.pdms.add({ pubsub$: true, topic: outTopic }, data => {
+        container.pdms.add({ pubsub$: true, topic: outTopic }, (data) => {
             container.logger.info(`PdmsShortCircuit receives from NATS(${outTopic}) data: ${JSON.stringify(data)}`)
             const msgToForward = _.merge({}, data, { pubsub$: true, topic: inTopic })
             container.logger.info(
@@ -63,7 +63,7 @@ describe('wsPdmsGw', () => {
         })
     }
 
-    it('message sending loopback through NATS', done => {
+    it('message sending loopback through NATS', (done) => {
         catchExitSignals(sandbox, done)
 
         const testJob = (container, next) => {
@@ -76,7 +76,7 @@ describe('wsPdmsGw', () => {
             setupPdmsShortCircuit(container, 'IN', 'OUT')
 
             // Subscribe to the 'IN' channel to catch the loopback response
-            consumerClient.on('IN', function(data) {
+            consumerClient.on('IN', function (data) {
                 console.log('consumerClient received from WS(IN): ', data)
                 expect(data).to.eql(inMessage)
                 next(null, null)

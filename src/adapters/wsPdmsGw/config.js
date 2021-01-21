@@ -1,11 +1,11 @@
 import _ from 'lodash'
 
-const getTopicArray = topicList =>
+const getTopicArray = (topicList) =>
     _.isUndefined(topicList) || !_.isString(topicList)
         ? []
         : topicList === ''
         ? []
-        : _.map(topicList.split(','), t => t.trim())
+        : _.map(topicList.split(','), (t) => t.trim())
 
 /**
  * The default configuration for the wsServer adapter

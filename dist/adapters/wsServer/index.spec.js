@@ -37,11 +37,10 @@ var _socket2 = _interopRequireDefault(_socket);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 describe('wsServer', function () {
-    var sandbox = void 0;
+    var sandbox = _sinon2.default;
 
     beforeEach(function (done) {
         (0, _npac.removeSignalHandlers)();
-        sandbox = _sinon2.default.sandbox.create({});
         done();
     });
 

@@ -12,12 +12,12 @@ import io from 'socket.io-client'
 describe('wsServer', () => {
     let sandbox = sinon
 
-    beforeEach(done => {
+    beforeEach((done) => {
         removeSignalHandlers()
         done()
     })
 
-    afterEach(done => {
+    afterEach((done) => {
         removeSignalHandlers()
         sandbox.restore()
         done()
@@ -34,7 +34,7 @@ describe('wsServer', () => {
 
     const terminators = [wsServer.shutdown, webServer.shutdown, pdms.shutdown]
 
-    it('message sending loopback', done => {
+    it('message sending loopback', (done) => {
         catchExitSignals(sandbox, done)
 
         const testJob = (container, next) => {
@@ -44,7 +44,7 @@ describe('wsServer', () => {
             const clientConsumer = io(serverUri)
 
             // Subscribe to the 'XYZ' channel to catch the loopback response
-            clientConsumer.on(message.topic, function(data) {
+            clientConsumer.on(message.topic, function (data) {
                 console.log('data arrived: ', data)
                 expect(data).to.eql(message)
                 clientProducer.close()
