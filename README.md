@@ -1,10 +1,9 @@
 npac-wsgw-adapters
 ==================
 
+[![Quality Check](https://github.com/tombenke/npac-wsgw-adapters/actions/workflows/quality_check.yml/badge.svg)](https://github.com/tombenke/npac-wsgw-adapters/actions/workflows/quality_check.yml)
 [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges)
 [![npm version][npm-badge]][npm-url]
-[![Build Status][travis-badge]][travis-url]
-[![Coveralls][BadgeCoveralls]][Coveralls]
 
 ## About
 
@@ -92,7 +91,3 @@ The default parameters can be found in the [`config.js`](https://github.com/tomb
 
 [npm-badge]: https://badge.fury.io/js/npac-wsgw-adapters.svg
 [npm-url]: https://badge.fury.io/js/npac-wsgw-adapters
-[travis-badge]: https://api.travis-ci.org/tombenke/npac-wsgw-adapters.svg
-[travis-url]: https://travis-ci.org/tombenke/npac-wsgw-adapters
-[Coveralls]: https://coveralls.io/github/tombenke/npac-wsgw-adapters?branch=master
-[BadgeCoveralls]: https://coveralls.io/repos/github/tombenke/npac-wsgw-adapters/badge.svg?branch=master
