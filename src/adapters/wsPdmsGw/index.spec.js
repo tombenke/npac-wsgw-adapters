@@ -36,6 +36,8 @@ describe('wsPdmsGw', () => {
         defaults,
         webServerConfig,
         wsServerConfig,
+        _.setWith({}, 'pdms.natsUri', /*process.env.PDMS_NATS_URI ||*/ 'nats://localhost:4222'),
+        _.setWith({}, 'pdms.timeout', /*process.env.PDMS_TIMEOUT ||*/ 2000),
         _.setWith({}, 'wsServer.forwardTopics', true),
         _.setWith({}, 'wsPdmsGw.topics.inbound', ['IN']),
         _.setWith({}, 'wsPdmsGw.topics.outbound', ['OUT'])

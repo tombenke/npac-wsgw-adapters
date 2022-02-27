@@ -23,11 +23,17 @@ describe('wsServer', () => {
         done()
     })
 
-    const webServerConfig = _.merge({}, webServer.defaults, {
-        webServer: {
-            restApiPath: __dirname + '../../../fixtures/api.yml'
+    const webServerConfig = _.merge(
+        {},
+        _.setWith({}, 'pdms.natsUri', /*process.env.PDMS_NATS_URI ||*/ 'nats://localhost:4222'),
+        _.setWith({}, 'pdms.timeout', /*process.env.PDMS_TIMEOUT ||*/ 2000),
+        webServer.defaults,
+        {
+            webServer: {
+                restApiPath: __dirname + '../../../fixtures/api.yml'
+            }
         }
-    })
+    )
     const config = _.merge({}, defaults, webServerConfig, _.setWith({}, 'wsServer.forwardTopics', true))
     console.log(config)
     const adapters = [mergeConfig(config), addLogger, pdms.startup, webServer.startup, wsServer.startup]
