@@ -30,17 +30,17 @@
   "main": "dist/index",
   "dependencies": {
     "@types/socket.io-client": "^1.4.35",
-    "datafile": "^3.4.1",
+    "datafile": "^3.4.5",
     "lodash": "^4.17.20",
-    "npac": "^2.1.8",
-    "npac-pdms-hemera-adapter": "^1.4.8",
+    "npac": "^2.1.11",
+    "npac-pdms-hemera-adapter": "^1.4.12",
     "socket.io": "^3.1.0",
     "socket.io-client": "^3.1.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
-    "babel-loader": "^8.2.2",
+    "babel-loader": "^8.2.3",
     "babel-plugin-transform-es2015-parameters": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "6.26.0",
     "babel-polyfill": "6.26.0",
@@ -48,26 +48,19 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-latest": "6.24.1",
     "babel-register": "^6.26.0",
-    "chai": "^4.2.0",
-    "coveralls": "^3.1.0",
+    "chai": "^4.3.6",
+    "coveralls": "^3.1.1",
     "cross-env": "^7.0.3",
     "eslint": "^7.18.0",
     "expect": "^26.6.2",
-    "husky": "^4.3.8",
     "istanbul": "1.1.0-alpha.1",
     "jsdoc": "^3.6.6",
     "mocha": "^9.2.1",
     "mocha-lcov-reporter": "^1.3.0",
     "npac-webserver-adapter": "^3.0.3",
-    "pre-push": "^0.1.1",
-    "prettier": "^2.2.1",
-    "sinon": "^9.2.3",
+    "prettier": "^2.5.1",
+    "sinon": "^13.0.1",
     "vinyl-buffer": "^1.0.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run prettier && npm run lint && npm run test && npm run build"
-    }
   },
   "prettier": {
     "printWidth": 120,
@@ -87,10 +80,5 @@
     "coveralls": "NODE_ENV=test istanbul cover _mocha --report lcovonly -- recursive --require babel-register --timeout 15000 'src/**/*.spec.js' -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "prepublishOnly": "npm run lint && npm run test && npm run build",
     "all": "npm run lint && npm run coverage && npm run build"
-  },
-  "pre-push": [
-    "lint",
-    "test",
-    "prepublishOnly"
-  ]
+  }
 }
