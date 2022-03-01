@@ -50,13 +50,12 @@ describe('wsServer', function () {
         done();
     });
 
-    var webServerConfig = _lodash2.default.merge({}, _npacWebserverAdapter2.default.defaults, {
+    var webServerConfig = _lodash2.default.merge({}, _lodash2.default.setWith({}, 'pdms.natsUri', /*process.env.PDMS_NATS_URI ||*/'nats://localhost:4222'), _lodash2.default.setWith({}, 'pdms.timeout', /*process.env.PDMS_TIMEOUT ||*/2000), _npacWebserverAdapter2.default.defaults, {
         webServer: {
             restApiPath: __dirname + '../../../fixtures/api.yml'
         }
     });
     var config = _lodash2.default.merge({}, _config2.default, webServerConfig, _lodash2.default.setWith({}, 'wsServer.forwardTopics', true));
-    console.log(config);
     var adapters = [(0, _npac.mergeConfig)(config), _npac.addLogger, _npacPdmsHemeraAdapter2.default.startup, _npacWebserverAdapter2.default.startup, _index2.default.startup];
 
     var terminators = [_index2.default.shutdown, _npacWebserverAdapter2.default.shutdown, _npacPdmsHemeraAdapter2.default.shutdown];

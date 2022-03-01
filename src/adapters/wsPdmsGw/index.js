@@ -14,13 +14,13 @@ import _ from 'lodash'
  *
  * @function
  */
-const setupInboundTopic = (container, wsClient) => (topic) => {
+const setupInboundTopic = (container, wsClient, forwarderEvent, forwardTopics) => (topic) => {
     // TODO: implement shutdown and enable reconnect.
-    if (_.isString(topic) && topic !== '') {
-        container.logger.info(`Setup observer to inbound NATS "${topic}" topic.`)
+    if (forwardTopics && _.isString(topic) && topic !== '') {
+        container.logger.info(`wsPdmsGw: Setup observer to inbound NATS "${topic}" topic.`)
         container.pdms.add({ pubsub$: true, topic: topic }, (data) => {
-            container.logger.info(`Forward from NATS(${topic}) data: ${JSON.stringify(data)} to WS(${topic})`)
-            wsClient.emit('message', data)
+            container.logger.info(`wsPdmsGw: Forward from NATS(${topic}) data: ${JSON.stringify(data)} to WS(${topic})`)
+            wsClient.emit(forwarderEvent, data)
         })
     }
 }
@@ -36,13 +36,15 @@ const setupInboundTopic = (container, wsClient) => (topic) => {
  *
  * @function
  */
-const setupOutboundTopic = (container, wsClient) => (topic) => {
+const setupOutboundTopic = (container, wsClient, forwardTopics) => (topic) => {
     // TODO: implement shutdown and enable reconnect.
-    if (_.isString(topic) && topic != '') {
-        container.logger.info(`Setup producer of outbound NATS "${topic}" topic.`)
+    if (forwardTopics && _.isString(topic) && topic != '') {
+        container.logger.info(`wsPdmsGw: Setup producer of outbound NATS "${topic}" topic.`)
         wsClient.on(topic, function (data) {
             const msgToForward = _.merge({}, data, { pubsub$: true, topic: topic })
-            container.logger.info(`Forward from WS(${topic}) data: ${JSON.stringify(msgToForward)} to NATS(${topic})`)
+            container.logger.info(
+                `wsPdmsGw: Forward from WS(${topic}) data: ${JSON.stringify(msgToForward)} to NATS(${topic})`
+            )
             container.pdms.act(msgToForward)
         })
     }
@@ -62,13 +64,16 @@ const setupOutboundTopic = (container, wsClient) => (topic) => {
  *
  * @function
  */
-const setupTopics = (container, wsClient, topics) => {
+const setupTopics = (container, wsClient, topics, forwarderEvent, forwardTopics) => {
+    container.logger.info(
+        `wsPdmsGw: setupTopics topics:${topics} forwarderEvent: ${forwarderEvent}, forwardTopics: ${forwardTopics}`
+    )
     if (_.isArray(topics.inbound)) {
-        _.map(topics.inbound, setupInboundTopic(container, wsClient))
+        _.map(topics.inbound, setupInboundTopic(container, wsClient, forwarderEvent, forwardTopics))
     }
 
     if (_.isArray(topics.outbound)) {
-        _.map(topics.outbound, setupOutboundTopic(container, wsClient))
+        _.map(topics.outbound, setupOutboundTopic(container, wsClient, forwardTopics))
     }
 }
 
@@ -89,11 +94,13 @@ const startup = (container, next) => {
     const serviceConfig = _.merge({}, defaults, { wsPdmsGw: container.config.wsPdmsGw || {} })
     container.logger.info('Start up wsPdmsGw adapter')
     container.logger.info(`wsPdmsGw.config: ${JSON.stringify(serviceConfig)}`)
+    const forwarderEvent = _.get(container, 'config.wsServer.forwarderEvent', 'message')
+    const forwardTopics = _.get(container, 'config.wsServer.forwardTopics', false)
 
     const serverUri = `http://localhost:${container.config.webServer.port}`
     const wsClient = ioClient(serverUri)
 
-    setupTopics(container, wsClient, serviceConfig.wsPdmsGw.topics)
+    setupTopics(container, wsClient, serviceConfig.wsPdmsGw.topics, forwarderEvent, forwardTopics)
 
     // Call next setup function with the context extension
     next(null, {

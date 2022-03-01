@@ -35,7 +35,6 @@ describe('wsServer', () => {
         }
     )
     const config = _.merge({}, defaults, webServerConfig, _.setWith({}, 'wsServer.forwardTopics', true))
-    console.log(config)
     const adapters = [mergeConfig(config), addLogger, pdms.startup, webServer.startup, wsServer.startup]
 
     const terminators = [wsServer.shutdown, webServer.shutdown, pdms.shutdown]

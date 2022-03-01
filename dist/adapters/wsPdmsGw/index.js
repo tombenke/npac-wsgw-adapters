@@ -25,14 +25,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @function
  */
-var setupInboundTopic = function setupInboundTopic(container, wsClient) {
+var setupInboundTopic = function setupInboundTopic(container, wsClient, forwarderEvent, forwardTopics) {
     return function (topic) {
         // TODO: implement shutdown and enable reconnect.
-        if (_lodash2.default.isString(topic) && topic !== '') {
-            container.logger.info('Setup observer to inbound NATS "' + topic + '" topic.');
+        if (forwardTopics && _lodash2.default.isString(topic) && topic !== '') {
+            container.logger.info('wsPdmsGw: Setup observer to inbound NATS "' + topic + '" topic.');
             container.pdms.add({ pubsub$: true, topic: topic }, function (data) {
-                container.logger.info('Forward from NATS(' + topic + ') data: ' + JSON.stringify(data) + ' to WS(' + topic + ')');
-                wsClient.emit('message', data);
+                container.logger.info('wsPdmsGw: Forward from NATS(' + topic + ') data: ' + JSON.stringify(data) + ' to WS(' + topic + ')');
+                wsClient.emit(forwarderEvent, data);
             });
         }
     };
@@ -49,14 +49,14 @@ var setupInboundTopic = function setupInboundTopic(container, wsClient) {
  *
  * @function
  */
-var setupOutboundTopic = function setupOutboundTopic(container, wsClient) {
+var setupOutboundTopic = function setupOutboundTopic(container, wsClient, forwardTopics) {
     return function (topic) {
         // TODO: implement shutdown and enable reconnect.
-        if (_lodash2.default.isString(topic) && topic != '') {
-            container.logger.info('Setup producer of outbound NATS "' + topic + '" topic.');
+        if (forwardTopics && _lodash2.default.isString(topic) && topic != '') {
+            container.logger.info('wsPdmsGw: Setup producer of outbound NATS "' + topic + '" topic.');
             wsClient.on(topic, function (data) {
                 var msgToForward = _lodash2.default.merge({}, data, { pubsub$: true, topic: topic });
-                container.logger.info('Forward from WS(' + topic + ') data: ' + JSON.stringify(msgToForward) + ' to NATS(' + topic + ')');
+                container.logger.info('wsPdmsGw: Forward from WS(' + topic + ') data: ' + JSON.stringify(msgToForward) + ' to NATS(' + topic + ')');
                 container.pdms.act(msgToForward);
             });
         }
@@ -77,13 +77,14 @@ var setupOutboundTopic = function setupOutboundTopic(container, wsClient) {
  *
  * @function
  */
-var setupTopics = function setupTopics(container, wsClient, topics) {
+var setupTopics = function setupTopics(container, wsClient, topics, forwarderEvent, forwardTopics) {
+    container.logger.info('wsPdmsGw: setupTopics topics:' + topics + ' forwarderEvent: ' + forwarderEvent + ', forwardTopics: ' + forwardTopics);
     if (_lodash2.default.isArray(topics.inbound)) {
-        _lodash2.default.map(topics.inbound, setupInboundTopic(container, wsClient));
+        _lodash2.default.map(topics.inbound, setupInboundTopic(container, wsClient, forwarderEvent, forwardTopics));
     }
 
     if (_lodash2.default.isArray(topics.outbound)) {
-        _lodash2.default.map(topics.outbound, setupOutboundTopic(container, wsClient));
+        _lodash2.default.map(topics.outbound, setupOutboundTopic(container, wsClient, forwardTopics));
     }
 };
 
@@ -104,11 +105,13 @@ var startup = function startup(container, next) {
     var serviceConfig = _lodash2.default.merge({}, _config2.default, { wsPdmsGw: container.config.wsPdmsGw || {} });
     container.logger.info('Start up wsPdmsGw adapter');
     container.logger.info('wsPdmsGw.config: ' + JSON.stringify(serviceConfig));
+    var forwarderEvent = _lodash2.default.get(container, 'config.wsServer.forwarderEvent', 'message');
+    var forwardTopics = _lodash2.default.get(container, 'config.wsServer.forwardTopics', false);
 
     var serverUri = 'http://localhost:' + container.config.webServer.port;
     var wsClient = (0, _socket2.default)(serverUri);
 
-    setupTopics(container, wsClient, serviceConfig.wsPdmsGw.topics);
+    setupTopics(container, wsClient, serviceConfig.wsPdmsGw.topics, forwarderEvent, forwardTopics);
 
     // Call next setup function with the context extension
     next(null, {
