@@ -15,10 +15,10 @@ after(function (done) {
     done();
 });
 
-describe('wsPdmsGw.config', function () {
+describe('wsServer.config', function () {
     it('#defaults', function (done) {
         var expected = {
-            wsPdmsGw: {
+            wsServer: {
                 topics: {
                     inbound: [],
                     outbound: []

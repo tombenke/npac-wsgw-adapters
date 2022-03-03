@@ -23,11 +23,19 @@ tasks:
       - npm run prettier
 
   test:
-    desc: Run all the tests.
+    desc: Run all the tests
     cmds:
       - task: format
       - task: dc-upd
       - npm run test
+      - task: dc-down
+
+  test-single:
+    desc: Run a single, selected testfile
+    cmds:
+      - task: format
+      - task: dc-upd
+      - npm run test-single {{.CLI_ARGS}}
       - task: dc-down
 
   coverage:
@@ -75,13 +83,12 @@ tasks:
   docs:
     desc: Generate the documentation
     cmds:
-      - echo "No documentation is generated." # npm run docs
+      - npm run docs
 
   clean:
     desc: Clean temporary files and folders
     cmds:
       - rm dist/* -fr
-      - rm docs/* -fr
 
   dc-up:
     desc: Start docker containers

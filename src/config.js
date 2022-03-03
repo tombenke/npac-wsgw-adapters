@@ -11,7 +11,7 @@ const getTopicArray = (topicList) =>
  * The default configuration for the wsServer adapter
  */
 module.exports = {
-    wsPdmsGw: {
+    wsServer: {
         topics: {
             // The list of inbound NATS topic names
             inbound: getTopicArray(process.env.WSPDMSGW_INBOUND_TOPICS),

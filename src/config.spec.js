@@ -12,8 +12,10 @@ describe('wsServer.config', () => {
     it('#defaults', (done) => {
         const expected = {
             wsServer: {
-                forwardTopics: false,
-                forwarderEvent: 'message'
+                topics: {
+                    inbound: [],
+                    outbound: []
+                }
             }
         }
 
