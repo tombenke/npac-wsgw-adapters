@@ -15,16 +15,21 @@ import _ from 'lodash'
  *
  * @function
  */
-const setupInboundTopic = (container, socket) => (topic) => {
+const setupInboundTopic = (container, server) => (topic) => {
+    // Add NATS observer
     container.logger.info(
         `wsServer: setupInboundTopic adds NATS topic observer to inbound NATS(${topic}) topic to forward to WS(${topic}) events`
     )
     container.pdms.add({ pubsub$: true, topic: topic }, (data) => {
         container.logger.info(
-            `wsServer: Forward data: ${JSON.stringify(data)} from NATS(${topic}) topic to WS(${topic}) event`
+            `wsServer: Inbound NATS topic observer received data: ${JSON.stringify(data)} from NATS(${topic})`
         )
-        //socket.emit(topic, data)
-        socket.broadcast.emit(topic, data.data)
+        container.logger.info(
+            `wsServer: Inbound NATS topic observer forward data: ${JSON.stringify(
+                data.data
+            )} from NATS(${topic}) topic to WS(${topic}) event`
+        )
+        server.emit(topic, data.data)
     })
 }
 
@@ -40,14 +45,14 @@ const setupInboundTopic = (container, socket) => (topic) => {
  *
  * @function
  */
-const setupOutboundTopic = (container, socket) => (topic) => {
+const setupOutboundTopic = (container, server) => (topic) => {
     container.logger.info(
         `wsServer: setupOutboundTopic adds WS event observer to outbound WS(${topic}) to forward to NATS "${topic}" topic`
     )
-    socket.on(topic, function (data, confirmCb) {
+    server.on(topic, (data, confirmCb) => {
         const msgToForward = _.merge({}, { pubsub$: true, topic: topic, data: data })
         container.logger.info(
-            `wsServer: outbound topic observer forwards data: ${JSON.stringify(
+            `wsServer: Outbound WS topic observer forwards data: ${JSON.stringify(
                 msgToForward
             )} from WS(${topic}) event to NATS(${topic}) topic`
         )
@@ -73,17 +78,17 @@ const setupOutboundTopic = (container, socket) => (topic) => {
  * @arg {Object} topics - The object, which holds two arrays of topic names, one for the `inbound` topics, and one for the `outbound` ones.
  *
  * @function
- */
-const setupTopics = (container, socket, topics) => {
+const setupTopics = (container, server, topics) => {
     container.logger.info(`wsServer: setupTopics topics:${JSON.stringify(topics)}`)
     if (_.isArray(topics.inbound)) {
-        _.map(topics.inbound, setupInboundTopic(container, socket))
+        _.map(topics.inbound, setupInboundTopic(container, server))
     }
 
     if (_.isArray(topics.outbound)) {
-        _.map(topics.outbound, setupOutboundTopic(container, socket))
+        _.map(topics.outbound, setupOutboundTopic(container, server))
     }
 }
+ */
 
 /**
  * The startup function of the adapter
@@ -104,42 +109,22 @@ const startup = (container, next) => {
     container.logger.info(`wsServer: Config: ${JSON.stringify(serviceConfig)}`)
     const io = SocketIo(container.webServer.server)
 
-    io.on('connection', function (socket) {
-        container.logger.info(`wsServer: Client connected ${socket.client.id}`)
-        setupTopics(container, socket, serviceConfig.wsServer.topics)
+    if (_.isArray(serviceConfig.wsServer.topics.inbound)) {
+        _.map(serviceConfig.wsServer.topics.inbound, setupInboundTopic(container, io))
+    }
 
-        //        socket.on(topic, function (data, confirmCb) {
-        //            container.logger.info(
-        //                `wsServer: WS(${topic}) forwarderEvent observer forwards ${JSON.stringify(data)} to WS(${topic}) event`
-        //            )
-        //            socket.broadcast.emit(topic, data)
-        //            /*
-        //            const targetEv = serviceConfig.wsServer.forwardTopics ? data.topic : forwarderEvent
-        //            container.logger.info(
-        //                `wsServer: WS(${forwarderEvent}) forwarderEvent observer forwards ${JSON.stringify(
-        //                    data
-        //                )} to WS(${targetEv}) event`
-        //            )
-        //            socket.broadcast.emit(targetEv, data)
-        //        */
-        //            if (_.isFunction(confirmCb)) {
-        //                confirmCb(true)
-        //            }
-        //        })
-        //        const topic2 = 'IN'
-        //        socket.on(topic2, function (data, confirmCb) {
-        //            container.logger.info(
-        //                `wsServer: WS(${topic2}) forwarderEvent observer forwards ${JSON.stringify(
-        //                    data
-        //                )} to WS(${topic2}) event`
-        //            )
-        //            socket.broadcast.emit(topic2, data)
-        //            if (_.isFunction(confirmCb)) {
-        //                confirmCb(true)
-        //            }
-        //        })
+    io.on('connection', (socket) => {
+        container.logger.info(`wsServer: Client ${socket.client.id} connected`)
+
+        if (_.isArray(serviceConfig.wsServer.topics.outbound)) {
+            _.map(serviceConfig.wsServer.topics.outbound, setupOutboundTopic(container, socket))
+        }
+
+        socket.on('disconnect', () => {
+            container.logger.info(`wsServer: Client ${socket.client.id} disconnected`)
+        })
     })
-    io.on('error', function (err) {
+    io.on('error', (err) => {
         container.logger.error('wsServer: Server ERROR:', err)
     })
     io.on('disconnection', (reason) => {

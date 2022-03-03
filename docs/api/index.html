@@ -99,7 +99,16 @@ See also the test cases in <a href="src/index.spec.js"><code>src/index.spec.js</
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#setupInboundTopic">setupInboundTopic</a></li><li><a href="global.html#setupOutboundTopic">setupOutboundTopic</a></li><li><a href="global.html#setupTopics">setupTopics</a></li><li><a href="global.html#shutdown">shutdown</a></li><li><a href="global.html#startup">startup</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#constsetupTopics=(container,server,topics)=%253E%257Bcontainer.logger.info(%2560wsServer:setupTopicstopics:$%257BJSON.stringify(topics)%257D%2560)if(_.isArray(topics.inbound))%257B_.map(topics.inbound,setupInboundTopic(container,server))%257Dif(_.isArray(topics.outbound))%257B_.map(topics.outbound,setupOutboundTopic(container,server))%257D%257D">const setupTopics = (container, server, topics) => {
+    container.logger.info(`wsServer: setupTopics topics:${JSON.stringify(topics)}`)
+    if (_.isArray(topics.inbound)) {
+        _.map(topics.inbound, setupInboundTopic(container, server))
+    }
+
+    if (_.isArray(topics.outbound)) {
+        _.map(topics.outbound, setupOutboundTopic(container, server))
+    }
+}</a></li><li><a href="global.html#setupInboundTopic">setupInboundTopic</a></li><li><a href="global.html#setupOutboundTopic">setupOutboundTopic</a></li><li><a href="global.html#shutdown">shutdown</a></li><li><a href="global.html#startup">startup</a></li></ul>
 </nav>
 
 <br class="clear">

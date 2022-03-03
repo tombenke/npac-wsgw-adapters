@@ -26,13 +26,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * @function
  */
-var setupInboundTopic = function setupInboundTopic(container, socket) {
+var setupInboundTopic = function setupInboundTopic(container, server) {
     return function (topic) {
+        // Add NATS observer
         container.logger.info('wsServer: setupInboundTopic adds NATS topic observer to inbound NATS(' + topic + ') topic to forward to WS(' + topic + ') events');
         container.pdms.add({ pubsub$: true, topic: topic }, function (data) {
-            container.logger.info('wsServer: Forward data: ' + JSON.stringify(data) + ' from NATS(' + topic + ') topic to WS(' + topic + ') event');
-            //socket.emit(topic, data)
-            socket.broadcast.emit(topic, data.data);
+            container.logger.info('wsServer: Inbound NATS topic observer received data: ' + JSON.stringify(data) + ' from NATS(' + topic + ')');
+            container.logger.info('wsServer: Inbound NATS topic observer forward data: ' + JSON.stringify(data.data) + ' from NATS(' + topic + ') topic to WS(' + topic + ') event');
+            server.emit(topic, data.data);
         });
     };
 };
@@ -49,12 +50,12 @@ var setupInboundTopic = function setupInboundTopic(container, socket) {
  *
  * @function
  */
-var setupOutboundTopic = function setupOutboundTopic(container, socket) {
+var setupOutboundTopic = function setupOutboundTopic(container, server) {
     return function (topic) {
         container.logger.info('wsServer: setupOutboundTopic adds WS event observer to outbound WS(' + topic + ') to forward to NATS "' + topic + '" topic');
-        socket.on(topic, function (data, confirmCb) {
+        server.on(topic, function (data, confirmCb) {
             var msgToForward = _lodash2.default.merge({}, { pubsub$: true, topic: topic, data: data });
-            container.logger.info('wsServer: outbound topic observer forwards data: ' + JSON.stringify(msgToForward) + ' from WS(' + topic + ') event to NATS(' + topic + ') topic');
+            container.logger.info('wsServer: Outbound WS topic observer forwards data: ' + JSON.stringify(msgToForward) + ' from WS(' + topic + ') event to NATS(' + topic + ') topic');
             container.pdms.act(msgToForward);
 
             if (_lodash2.default.isFunction(confirmCb)) {
@@ -78,17 +79,17 @@ var setupOutboundTopic = function setupOutboundTopic(container, socket) {
  * @arg {Object} topics - The object, which holds two arrays of topic names, one for the `inbound` topics, and one for the `outbound` ones.
  *
  * @function
- */
-var setupTopics = function setupTopics(container, socket, topics) {
-    container.logger.info('wsServer: setupTopics topics:' + JSON.stringify(topics));
-    if (_lodash2.default.isArray(topics.inbound)) {
-        _lodash2.default.map(topics.inbound, setupInboundTopic(container, socket));
+const setupTopics = (container, server, topics) => {
+    container.logger.info(`wsServer: setupTopics topics:${JSON.stringify(topics)}`)
+    if (_.isArray(topics.inbound)) {
+        _.map(topics.inbound, setupInboundTopic(container, server))
     }
 
-    if (_lodash2.default.isArray(topics.outbound)) {
-        _lodash2.default.map(topics.outbound, setupOutboundTopic(container, socket));
+    if (_.isArray(topics.outbound)) {
+        _.map(topics.outbound, setupOutboundTopic(container, server))
     }
-};
+}
+ */
 
 /**
  * The startup function of the adapter
@@ -109,40 +110,20 @@ var startup = function startup(container, next) {
     container.logger.info('wsServer: Config: ' + JSON.stringify(serviceConfig));
     var io = (0, _socket2.default)(container.webServer.server);
 
-    io.on('connection', function (socket) {
-        container.logger.info('wsServer: Client connected ' + socket.client.id);
-        setupTopics(container, socket, serviceConfig.wsServer.topics);
+    if (_lodash2.default.isArray(serviceConfig.wsServer.topics.inbound)) {
+        _lodash2.default.map(serviceConfig.wsServer.topics.inbound, setupInboundTopic(container, io));
+    }
 
-        //        socket.on(topic, function (data, confirmCb) {
-        //            container.logger.info(
-        //                `wsServer: WS(${topic}) forwarderEvent observer forwards ${JSON.stringify(data)} to WS(${topic}) event`
-        //            )
-        //            socket.broadcast.emit(topic, data)
-        //            /*
-        //            const targetEv = serviceConfig.wsServer.forwardTopics ? data.topic : forwarderEvent
-        //            container.logger.info(
-        //                `wsServer: WS(${forwarderEvent}) forwarderEvent observer forwards ${JSON.stringify(
-        //                    data
-        //                )} to WS(${targetEv}) event`
-        //            )
-        //            socket.broadcast.emit(targetEv, data)
-        //        */
-        //            if (_.isFunction(confirmCb)) {
-        //                confirmCb(true)
-        //            }
-        //        })
-        //        const topic2 = 'IN'
-        //        socket.on(topic2, function (data, confirmCb) {
-        //            container.logger.info(
-        //                `wsServer: WS(${topic2}) forwarderEvent observer forwards ${JSON.stringify(
-        //                    data
-        //                )} to WS(${topic2}) event`
-        //            )
-        //            socket.broadcast.emit(topic2, data)
-        //            if (_.isFunction(confirmCb)) {
-        //                confirmCb(true)
-        //            }
-        //        })
+    io.on('connection', function (socket) {
+        container.logger.info('wsServer: Client ' + socket.client.id + ' connected');
+
+        if (_lodash2.default.isArray(serviceConfig.wsServer.topics.outbound)) {
+            _lodash2.default.map(serviceConfig.wsServer.topics.outbound, setupOutboundTopic(container, socket));
+        }
+
+        socket.on('disconnect', function () {
+            container.logger.info('wsServer: Client ' + socket.client.id + ' disconnected');
+        });
     });
     io.on('error', function (err) {
         container.logger.error('wsServer: Server ERROR:', err);
