@@ -48,14 +48,10 @@
 <a href="http://github.com/badges/stability-badges"><img src="http://badges.github.io/stability-badges/dist/stable.svg" alt="stable"></a><br>
 <a href="https://badge.fury.io/js/npac-wsgw-adapters"><img src="https://badge.fury.io/js/npac-wsgw-adapters.svg" alt="npm version"></a></p>
 <h2>About</h2>
-<p>This repository holds the following <a href="http://tombenke.github.io/npac">npac</a> adapter modules for websocket servers and websocket-NATS gateways:</p>
-<ul>
-<li><a href="src/adapters/wsServer/"><code>wsServer</code></a>, a WebSocket server adapter,</li>
-<li><a href="src/adapters/wsPdmsGw/"><code>wsPdmsGw</code></a>, a WebSocket &lt;-&gt; NATS gateway.</li>
-</ul>
+<p>This repository holds a <a href="http://tombenke.github.io/npac">npac</a> adapter module that acts both as a WebSocket server as well as a websocket-NATS gateway.</p>
 <p>These adapters are the main parts of the <a href="https://github.com/tombenke/wsgw">wsgw</a> WebSocket server and client application that has built-in NATS gateway functionality. See <a href="https://github.com/tombenke/wsgw">wsgw</a> project for details about how it is working.</p>
 <p>You can add these adapters to your <a href="http://tombenke.github.io/npac">npac</a>-based application, but in case you need an off-the-shelf web server with WebSocket that also includes these adapters,and provides the NATS gateway functionality as well, then use <a href="https://www.npmjs.com/package/easer">easer</a> instead.</p>
-<p>The applications that use these adapters, also needs to <a href="https://github.com/tombenke/npac-pdms-hemera-adapter">npac-pdms-hemera-adapter</a> and <a href="https://github.com/tombenke/npac-webserver-adapter/">npac-webserver-adapter</a> adapters added to the application container.</p>
+<p>The applications that use this adapter, also needs to <a href="https://github.com/tombenke/npac-pdms-hemera-adapter">npac-pdms-hemera-adapter</a> and <a href="https://github.com/tombenke/npac-webserver-adapter/">npac-webserver-adapter</a> adapters added to the application container.</p>
 <h2>Installation</h2>
 <p>Run the install command:</p>
 <pre><code>npm install --save npac-wsgw-adapters
@@ -66,22 +62,6 @@
 <p>The default parameters can be found in <a href="src/adapters/wsServer/config.js"><code>src/adapters/wsServer/config.js</code></a>:</p>
 <pre class="prettyprint source lang-JavaScript"><code>    {
         wsServer: {
-            // The name of the event, where the WebSocket messages will be sent for forwarding
-            // The messages should have a `topic` property,
-            // that holds the name of the WebSocket event in case of inbound messages,
-            // or the name of the NATS topic in case of the outbound messages.
-            forwarderEvent: process.env.WSSERVER_FORWARDER_EVENT || 'message',
-
-            // If true, the WebSocket server will forward the messages to the target topic
-            forwardTopics: process.env.WSSERVER_FORWARD_TOPICS || false
-        }
-    }
-</code></pre>
-<h3>The config parameters of the <code>wsPdmsGw</code> adapter</h3>
-<p>This module uses the <code>config.wsPdmsGw</code> property to gain its configuration parameters.</p>
-<p>The default parameters can be found in <a href="src/adapters/wsPdmsGw/config.js"><code>src/adapters/wsPdmsGw/config.js</code></a>:</p>
-<pre class="prettyprint source lang-JavaScript"><code>    {
-        wsPdmsGw: {
             inbound: [], // The list of inbound NATS topic names
             outbound: [] // The list of outbound NATS topic names
         }

@@ -7,16 +7,16 @@ npac-wsgw-adapters
 
 ## About
 
-This repository holds the following [npac](http://tombenke.github.io/npac) adapter modules for websocket servers and websocket-NATS gateways:
-
-- [`wsServer`](src/adapters/wsServer/), a WebSocket server adapter,
-- [`wsPdmsGw`](src/adapters/wsPdmsGw/), a WebSocket <-> NATS gateway.
+This repository holds a [npac](http://tombenke.github.io/npac) adapter module that acts both as a WebSocket server as well as a websocket-NATS gateway.
 
 These adapters are the main parts of the [wsgw](https://github.com/tombenke/wsgw) WebSocket server and client application that has built-in NATS gateway functionality. See [wsgw](https://github.com/tombenke/wsgw) project for details about how it is working.
 
 You can add these adapters to your [npac](http://tombenke.github.io/npac)-based application, but in case you need an off-the-shelf web server with WebSocket that also includes these adapters,and provides the NATS gateway functionality as well, then use [easer](https://www.npmjs.com/package/easer) instead.
 
-The applications that use these adapters, also needs to [npac-pdms-hemera-adapter](https://github.com/tombenke/npac-pdms-hemera-adapter) and [npac-webserver-adapter](https://github.com/tombenke/npac-webserver-adapter/) adapters added to the application container.
+The applications that use this adapter, also needs to [npac-pdms-hemera-adapter](https://github.com/tombenke/npac-pdms-hemera-adapter) and [npac-webserver-adapter](https://github.com/tombenke/npac-webserver-adapter/) adapters added to the application container.
+
+To learn more about the functions visit the [API docs](https://tombenke.github.io/npac-wsgw-adapters/api/).
+See also the test cases in [`src/index.spec.js`](src/index.spec.js) as examples of how to configure and use the module.
 
 
 ## Installation
@@ -36,27 +36,6 @@ The default parameters can be found in [`src/adapters/wsServer/config.js`](src/a
 ```JavaScript
     {
         wsServer: {
-            // The name of the event, where the WebSocket messages will be sent for forwarding
-            // The messages should have a `topic` property,
-            // that holds the name of the WebSocket event in case of inbound messages,
-            // or the name of the NATS topic in case of the outbound messages.
-            forwarderEvent: process.env.WSSERVER_FORWARDER_EVENT || 'message',
-
-            // If true, the WebSocket server will forward the messages to the target topic
-            forwardTopics: process.env.WSSERVER_FORWARD_TOPICS || false
-        }
-    }
-```
-
-### The config parameters of the `wsPdmsGw` adapter
-
-This module uses the `config.wsPdmsGw` property to gain its configuration parameters.
-
-The default parameters can be found in [`src/adapters/wsPdmsGw/config.js`](src/adapters/wsPdmsGw/config.js):
-
-```JavaScript
-    {
-        wsPdmsGw: {
             inbound: [], // The list of inbound NATS topic names
             outbound: [] // The list of outbound NATS topic names
         }
