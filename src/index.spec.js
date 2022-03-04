@@ -34,17 +34,12 @@ describe('wsServer', () => {
     const makeAdapters = (config) => [mergeConfig(config), addLogger, pdms.startup, webServer.startup, wsServer.startup]
     const terminators = [wsServer.shutdown, webServer.shutdown, pdms.shutdown]
 
-    const setupPdmsShortCircuit = (container, inTopic, outTopic) => {
-        container.logger.info(`test: PdmsShortCircuit sets up observer to NATS(${outTopic})`)
-        container.pdms.add({ pubsub$: true, topic: outTopic }, (data) => {
-            container.logger.info(
-                `test: PdmsShortCircuit receives from NATS(${outTopic}) data: ${JSON.stringify(data)}`
-            )
-            const msgToForward = _.merge({}, { pubsub$: true, topic: inTopic, data: data.data })
-            container.logger.info(
-                `test: PdmsShortCircuit sends data: ${JSON.stringify(msgToForward)} to NATS(${inTopic})`
-            )
-            container.pdms.act(msgToForward)
+    const setupNatsShortCircuit = (container, inTopic, outTopic) => {
+        container.logger.info(`test: NATS client short-circuit sets up observer to NATS(${outTopic})`)
+        container.pdms.subscribe(outTopic, (data) => {
+            container.logger.info(`test: NatsShortCircuit receives from NATS(${outTopic}) data: ${data}`)
+            container.logger.info(`test: NatsShortCircuit sends data: ${data} to NATS(${inTopic})`)
+            container.pdms.publish(inTopic, data)
         })
     }
 
@@ -76,15 +71,13 @@ describe('wsServer', () => {
                     container.logger.info(
                         `test: consumerClient received data: ${JSON.stringify(data)} from WS(${topic})`
                     )
-                    expect(data).to.eql(message)
+                    expect(JSON.parse(data)).to.eql(message)
                     next(null, null)
                 })
 
-                const msgToForward = _.merge({}, { pubsub$: true, topic: topic, data: message })
-                container.logger.info(
-                    `test: producerClient sends data: ${JSON.stringify(msgToForward)} to NATS(${topic})`
-                )
-                container.pdms.act(msgToForward)
+                container.logger.info(`test: producerClient sends data: ${JSON.stringify(message)} to NATS(${topic})`)
+                //container.pdms.act(msgToForward)
+                container.pdms.publish(topic, JSON.stringify(message))
             })
         }
 
@@ -100,11 +93,10 @@ describe('wsServer', () => {
             const topic = 'OUT'
             const message = { note: 'text...', number: 42, floatValue: 42.24 }
 
-            // Subscribe to the 'OUT' channel to catch the message
             container.logger.info(`test: consumerClient subscribes to NATS(${topic})`)
-            container.pdms.add({ pubsub$: true, topic: topic }, (data) => {
+            container.pdms.subscribe(topic, (data) => {
                 container.logger.info(`test: consumerClient received data: ${JSON.stringify(data)} from NATS(${topic})`)
-                expect(data.data).to.eql(message)
+                expect(JSON.parse(data)).to.eql(message)
                 next(null, null)
             })
 
@@ -113,7 +105,7 @@ describe('wsServer', () => {
             producerClient.on('connect', () => {
                 container.logger.info(`test: producerClient is connected to WS(${wsServerUri})`)
                 container.logger.info(`test: producerClient emits data: ${JSON.stringify(message)} to WS(${topic})`)
-                producerClient.emit(topic, message)
+                producerClient.emit(topic, JSON.stringify(message))
             })
         }
 
@@ -131,7 +123,7 @@ describe('wsServer', () => {
             const outMessage = { note: 'text...', number: 42, floatValue: 42.24 }
             const inMessage = outMessage
 
-            setupPdmsShortCircuit(container, inTopic, outTopic)
+            setupNatsShortCircuit(container, inTopic, outTopic)
 
             // Subscribe to the 'IN' channel to catch the loopback response
             container.logger.info(`test: consumerClient connects to ${serverUri}`)
@@ -141,7 +133,7 @@ describe('wsServer', () => {
                 container.logger.info(`test: consumerClient subscribes to WS(${inTopic}) events`)
                 consumerClient.on(inTopic, function (data) {
                     container.logger.info(`test: consumerClient received data: ${data} from WS(${inTopic})`)
-                    expect(data).to.eql(inMessage)
+                    expect(JSON.parse(data)).to.eql(inMessage)
                     producerClient.close()
                     consumerClient.close()
                     next(null, null)
@@ -157,7 +149,7 @@ describe('wsServer', () => {
                     container.logger.info(
                         `test: producerClient emits data: ${JSON.stringify(outMessage)} to WS(${outTopic})`
                     )
-                    producerClient.emit(outTopic, outMessage)
+                    producerClient.emit(outTopic, JSON.stringify(outMessage))
                 })
             })
         }

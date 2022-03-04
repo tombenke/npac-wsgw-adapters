@@ -55,13 +55,12 @@ describe('wsServer', function () {
     };
     var terminators = [_index2.default.shutdown, _npacWebserverAdapter2.default.shutdown, _npacPdmsHemeraAdapter2.default.shutdown];
 
-    var setupPdmsShortCircuit = function setupPdmsShortCircuit(container, inTopic, outTopic) {
-        container.logger.info('test: PdmsShortCircuit sets up observer to NATS(' + outTopic + ')');
-        container.pdms.add({ pubsub$: true, topic: outTopic }, function (data) {
-            container.logger.info('test: PdmsShortCircuit receives from NATS(' + outTopic + ') data: ' + JSON.stringify(data));
-            var msgToForward = _lodash2.default.merge({}, { pubsub$: true, topic: inTopic, data: data.data });
-            container.logger.info('test: PdmsShortCircuit sends data: ' + JSON.stringify(msgToForward) + ' to NATS(' + inTopic + ')');
-            container.pdms.act(msgToForward);
+    var setupNatsShortCircuit = function setupNatsShortCircuit(container, inTopic, outTopic) {
+        container.logger.info('test: NATS client short-circuit sets up observer to NATS(' + outTopic + ')');
+        container.pdms.subscribe(outTopic, function (data) {
+            container.logger.info('test: NatsShortCircuit receives from NATS(' + outTopic + ') data: ' + data);
+            container.logger.info('test: NatsShortCircuit sends data: ' + data + ' to NATS(' + inTopic + ')');
+            container.pdms.publish(inTopic, data);
         });
     };
 
@@ -91,13 +90,13 @@ describe('wsServer', function () {
                 container.logger.info('test: consumerClient subscribes to WS(' + topic + ') events');
                 consumerClient.on(topic, function (data) {
                     container.logger.info('test: consumerClient received data: ' + JSON.stringify(data) + ' from WS(' + topic + ')');
-                    (0, _chai.expect)(data).to.eql(message);
+                    (0, _chai.expect)(JSON.parse(data)).to.eql(message);
                     next(null, null);
                 });
 
-                var msgToForward = _lodash2.default.merge({}, { pubsub$: true, topic: topic, data: message });
-                container.logger.info('test: producerClient sends data: ' + JSON.stringify(msgToForward) + ' to NATS(' + topic + ')');
-                container.pdms.act(msgToForward);
+                container.logger.info('test: producerClient sends data: ' + JSON.stringify(message) + ' to NATS(' + topic + ')');
+                //container.pdms.act(msgToForward)
+                container.pdms.publish(topic, JSON.stringify(message));
             });
         };
 
@@ -111,13 +110,12 @@ describe('wsServer', function () {
         var testJob = function testJob(container, next) {
             var wsServerUri = 'http://localhost:' + config.webServer.port;
             var topic = 'OUT';
-            var message = { note: 'text...', number: 42, floatValue: 42.24
+            var message = { note: 'text...', number: 42, floatValue: 42.24 };
 
-                // Subscribe to the 'OUT' channel to catch the message
-            };container.logger.info('test: consumerClient subscribes to NATS(' + topic + ')');
-            container.pdms.add({ pubsub$: true, topic: topic }, function (data) {
+            container.logger.info('test: consumerClient subscribes to NATS(' + topic + ')');
+            container.pdms.subscribe(topic, function (data) {
                 container.logger.info('test: consumerClient received data: ' + JSON.stringify(data) + ' from NATS(' + topic + ')');
-                (0, _chai.expect)(data.data).to.eql(message);
+                (0, _chai.expect)(JSON.parse(data)).to.eql(message);
                 next(null, null);
             });
 
@@ -126,7 +124,7 @@ describe('wsServer', function () {
             producerClient.on('connect', function () {
                 container.logger.info('test: producerClient is connected to WS(' + wsServerUri + ')');
                 container.logger.info('test: producerClient emits data: ' + JSON.stringify(message) + ' to WS(' + topic + ')');
-                producerClient.emit(topic, message);
+                producerClient.emit(topic, JSON.stringify(message));
             });
         };
 
@@ -144,7 +142,7 @@ describe('wsServer', function () {
             var outMessage = { note: 'text...', number: 42, floatValue: 42.24 };
             var inMessage = outMessage;
 
-            setupPdmsShortCircuit(container, inTopic, outTopic);
+            setupNatsShortCircuit(container, inTopic, outTopic);
 
             // Subscribe to the 'IN' channel to catch the loopback response
             container.logger.info('test: consumerClient connects to ' + serverUri);
@@ -154,7 +152,7 @@ describe('wsServer', function () {
                 container.logger.info('test: consumerClient subscribes to WS(' + inTopic + ') events');
                 consumerClient.on(inTopic, function (data) {
                     container.logger.info('test: consumerClient received data: ' + data + ' from WS(' + inTopic + ')');
-                    (0, _chai.expect)(data).to.eql(inMessage);
+                    (0, _chai.expect)(JSON.parse(data)).to.eql(inMessage);
                     producerClient.close();
                     consumerClient.close();
                     next(null, null);
@@ -168,7 +166,7 @@ describe('wsServer', function () {
                 producerClient.on('connect', function () {
                     container.logger.info('test: producerClient is connected to WS(' + serverUri + ')');
                     container.logger.info('test: producerClient emits data: ' + JSON.stringify(outMessage) + ' to WS(' + outTopic + ')');
-                    producerClient.emit(outTopic, outMessage);
+                    producerClient.emit(outTopic, JSON.stringify(outMessage));
                 });
             });
         };

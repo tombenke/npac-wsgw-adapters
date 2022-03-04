@@ -20,16 +20,17 @@ const setupInboundTopic = (container, server) => (topic) => {
     container.logger.info(
         `wsServer: setupInboundTopic adds NATS topic observer to inbound NATS(${topic}) topic to forward to WS(${topic}) events`
     )
-    container.pdms.add({ pubsub$: true, topic: topic }, (data) => {
+    //container.pdms.add({ pubsub$: true, topic: topic }, (data) => {
+    container.pdms.subscribe(topic, (data) => {
         container.logger.info(
             `wsServer: Inbound NATS topic observer received data: ${JSON.stringify(data)} from NATS(${topic})`
         )
         container.logger.info(
             `wsServer: Inbound NATS topic observer forward data: ${JSON.stringify(
-                data.data
+                data
             )} from NATS(${topic}) topic to WS(${topic}) event`
         )
-        server.emit(topic, data.data)
+        server.emit(topic, data)
     })
 }
 
@@ -50,13 +51,19 @@ const setupOutboundTopic = (container, server) => (topic) => {
         `wsServer: setupOutboundTopic adds WS event observer to outbound WS(${topic}) to forward to NATS "${topic}" topic`
     )
     server.on(topic, (data, confirmCb) => {
-        const msgToForward = _.merge({}, { pubsub$: true, topic: topic, data: data })
+        //const msgToForward = _.merge({}, { pubsub$: true, topic: topic, data: data })
+        //container.logger.info(
+        //    `wsServer: Outbound WS topic observer forwards data: ${JSON.stringify(
+        //        msgToForward
+        //    )} from WS(${topic}) event to NATS(${topic}) topic`
+        //)
+        //container.pdms.act(msgToForward)
         container.logger.info(
             `wsServer: Outbound WS topic observer forwards data: ${JSON.stringify(
-                msgToForward
+                data
             )} from WS(${topic}) event to NATS(${topic}) topic`
         )
-        container.pdms.act(msgToForward)
+        container.pdms.publish(topic, data)
 
         if (_.isFunction(confirmCb)) {
             confirmCb(true)

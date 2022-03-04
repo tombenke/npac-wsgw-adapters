@@ -30,10 +30,11 @@ var setupInboundTopic = function setupInboundTopic(container, server) {
     return function (topic) {
         // Add NATS observer
         container.logger.info('wsServer: setupInboundTopic adds NATS topic observer to inbound NATS(' + topic + ') topic to forward to WS(' + topic + ') events');
-        container.pdms.add({ pubsub$: true, topic: topic }, function (data) {
+        //container.pdms.add({ pubsub$: true, topic: topic }, (data) => {
+        container.pdms.subscribe(topic, function (data) {
             container.logger.info('wsServer: Inbound NATS topic observer received data: ' + JSON.stringify(data) + ' from NATS(' + topic + ')');
-            container.logger.info('wsServer: Inbound NATS topic observer forward data: ' + JSON.stringify(data.data) + ' from NATS(' + topic + ') topic to WS(' + topic + ') event');
-            server.emit(topic, data.data);
+            container.logger.info('wsServer: Inbound NATS topic observer forward data: ' + JSON.stringify(data) + ' from NATS(' + topic + ') topic to WS(' + topic + ') event');
+            server.emit(topic, data);
         });
     };
 };
@@ -54,9 +55,15 @@ var setupOutboundTopic = function setupOutboundTopic(container, server) {
     return function (topic) {
         container.logger.info('wsServer: setupOutboundTopic adds WS event observer to outbound WS(' + topic + ') to forward to NATS "' + topic + '" topic');
         server.on(topic, function (data, confirmCb) {
-            var msgToForward = _lodash2.default.merge({}, { pubsub$: true, topic: topic, data: data });
-            container.logger.info('wsServer: Outbound WS topic observer forwards data: ' + JSON.stringify(msgToForward) + ' from WS(' + topic + ') event to NATS(' + topic + ') topic');
-            container.pdms.act(msgToForward);
+            //const msgToForward = _.merge({}, { pubsub$: true, topic: topic, data: data })
+            //container.logger.info(
+            //    `wsServer: Outbound WS topic observer forwards data: ${JSON.stringify(
+            //        msgToForward
+            //    )} from WS(${topic}) event to NATS(${topic}) topic`
+            //)
+            //container.pdms.act(msgToForward)
+            container.logger.info('wsServer: Outbound WS topic observer forwards data: ' + JSON.stringify(data) + ' from WS(' + topic + ') event to NATS(' + topic + ') topic');
+            container.pdms.publish(topic, data);
 
             if (_lodash2.default.isFunction(confirmCb)) {
                 confirmCb(true);
