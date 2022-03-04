@@ -33,7 +33,7 @@
     "datafile": "^3.4.5",
     "lodash": "^4.17.20",
     "npac": "^2.1.11",
-    "npac-pdms-hemera-adapter": "^1.5.0",
+    "npac-pdms-hemera-adapter": "^1.6.0",
     "socket.io": "^4.4.1",
     "socket.io-client": "^4.4.1"
   },
@@ -57,7 +57,7 @@
     "jsdoc": "^3.6.6",
     "mocha": "^9.2.1",
     "mocha-lcov-reporter": "^1.3.0",
-    "npac-webserver-adapter": "^4.0.2",
+    "npac-webserver-adapter": "^4.0.3",
     "prettier": "^2.5.1",
     "sinon": "^13.0.1",
     "vinyl-buffer": "^1.0.0"

@@ -15,6 +15,7 @@ tasks:
       - task: format
       - task: lint
       - task: test
+      - task: build
       - task: docs
 
   format:
