@@ -61,7 +61,6 @@ describe('wsServer', () => {
             const topic = 'IN'
             const message = { note: 'text...', number: 42, floatValue: 42.24 }
 
-            // Subscribe to the 'IN' channel to catch the message
             container.logger.info(`test: consumerClient connects to ${wsServerUri}`)
             const consumerClient = io(wsServerUri, { reconnection: false })
             consumerClient.on('connect', () => {
@@ -76,7 +75,6 @@ describe('wsServer', () => {
                 })
 
                 container.logger.info(`test: producerClient sends data: ${JSON.stringify(message)} to NATS(${topic})`)
-                //container.pdms.act(msgToForward)
                 container.pdms.publish(topic, JSON.stringify(message))
             })
         }
@@ -125,7 +123,6 @@ describe('wsServer', () => {
 
             setupNatsShortCircuit(container, inTopic, outTopic)
 
-            // Subscribe to the 'IN' channel to catch the loopback response
             container.logger.info(`test: consumerClient connects to ${serverUri}`)
             const consumerClient = io(serverUri)
             consumerClient.on('connect', () => {

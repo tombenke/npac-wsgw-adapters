@@ -104,8 +104,8 @@
     
 
     
-    <h4 class="name" id="constsetupTopics=(container,server,topics)=%3E%7Bcontainer.logger.info(%60wsServer:setupTopicstopics:$%7BJSON.stringify(topics)%7D%60)if(_.isArray(topics.inbound))%7B_.map(topics.inbound,setupInboundTopic(container,server))%7Dif(_.isArray(topics.outbound))%7B_.map(topics.outbound,setupOutboundTopic(container,server))%7D%7D"><span class="type-signature"></span>const setupTopics = (container, server, topics) => {
-    container.logger.info(`wsServer: setupTopics topics:${JSON.stringify(topics)}`)
+    <h4 class="name" id="constsetupTopics=(container,server,topics)=%3E%7Bcontainer.logger.debug(%60wsServer:setupTopicstopics:$%7BJSON.stringify(topics)%7D%60)if(_.isArray(topics.inbound))%7B_.map(topics.inbound,setupInboundTopic(container,server))%7Dif(_.isArray(topics.outbound))%7B_.map(topics.outbound,setupOutboundTopic(container,server))%7D%7D"><span class="type-signature"></span>const setupTopics = (container, server, topics) => {
+    container.logger.debug(`wsServer: setupTopics topics:${JSON.stringify(topics)}`)
     if (_.isArray(topics.inbound)) {
         _.map(topics.inbound, setupInboundTopic(container, server))
     }
@@ -978,8 +978,8 @@ NATS topic with the same name.</p>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#constsetupTopics=(container,server,topics)=%253E%257Bcontainer.logger.info(%2560wsServer:setupTopicstopics:$%257BJSON.stringify(topics)%257D%2560)if(_.isArray(topics.inbound))%257B_.map(topics.inbound,setupInboundTopic(container,server))%257Dif(_.isArray(topics.outbound))%257B_.map(topics.outbound,setupOutboundTopic(container,server))%257D%257D">const setupTopics = (container, server, topics) => {
-    container.logger.info(`wsServer: setupTopics topics:${JSON.stringify(topics)}`)
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#constsetupTopics=(container,server,topics)=%253E%257Bcontainer.logger.debug(%2560wsServer:setupTopicstopics:$%257BJSON.stringify(topics)%257D%2560)if(_.isArray(topics.inbound))%257B_.map(topics.inbound,setupInboundTopic(container,server))%257Dif(_.isArray(topics.outbound))%257B_.map(topics.outbound,setupOutboundTopic(container,server))%257D%257D">const setupTopics = (container, server, topics) => {
+    container.logger.debug(`wsServer: setupTopics topics:${JSON.stringify(topics)}`)
     if (_.isArray(topics.inbound)) {
         _.map(topics.inbound, setupInboundTopic(container, server))
     }

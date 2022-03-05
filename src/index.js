@@ -17,15 +17,15 @@ import _ from 'lodash'
  */
 const setupInboundTopic = (container, server) => (topic) => {
     // Add NATS observer
-    container.logger.info(
+    container.logger.debug(
         `wsServer: setupInboundTopic adds NATS topic observer to inbound NATS(${topic}) topic to forward to WS(${topic}) events`
     )
     //container.pdms.add({ pubsub$: true, topic: topic }, (data) => {
     container.pdms.subscribe(topic, (data) => {
-        container.logger.info(
+        container.logger.debug(
             `wsServer: Inbound NATS topic observer received data: ${JSON.stringify(data)} from NATS(${topic})`
         )
-        container.logger.info(
+        container.logger.debug(
             `wsServer: Inbound NATS topic observer forward data: ${JSON.stringify(
                 data
             )} from NATS(${topic}) topic to WS(${topic}) event`
@@ -47,18 +47,18 @@ const setupInboundTopic = (container, server) => (topic) => {
  * @function
  */
 const setupOutboundTopic = (container, server) => (topic) => {
-    container.logger.info(
+    container.logger.debug(
         `wsServer: setupOutboundTopic adds WS event observer to outbound WS(${topic}) to forward to NATS "${topic}" topic`
     )
     server.on(topic, (data, confirmCb) => {
         //const msgToForward = _.merge({}, { pubsub$: true, topic: topic, data: data })
-        //container.logger.info(
+        //container.logger.debug(
         //    `wsServer: Outbound WS topic observer forwards data: ${JSON.stringify(
         //        msgToForward
         //    )} from WS(${topic}) event to NATS(${topic}) topic`
         //)
         //container.pdms.act(msgToForward)
-        container.logger.info(
+        container.logger.debug(
             `wsServer: Outbound WS topic observer forwards data: ${JSON.stringify(
                 data
             )} from WS(${topic}) event to NATS(${topic}) topic`
@@ -86,7 +86,7 @@ const setupOutboundTopic = (container, server) => (topic) => {
  *
  * @function
 const setupTopics = (container, server, topics) => {
-    container.logger.info(`wsServer: setupTopics topics:${JSON.stringify(topics)}`)
+    container.logger.debug(`wsServer: setupTopics topics:${JSON.stringify(topics)}`)
     if (_.isArray(topics.inbound)) {
         _.map(topics.inbound, setupInboundTopic(container, server))
     }
@@ -113,7 +113,7 @@ const startup = (container, next) => {
     // Merges the defaults with the config coming from the outer world
     const serviceConfig = _.merge({}, defaults, { wsServer: container.config.wsServer || {} })
     container.logger.info('wsServer: Start up wsServer adapter')
-    container.logger.info(`wsServer: Config: ${JSON.stringify(serviceConfig)}`)
+    container.logger.debug(`wsServer: Config: ${JSON.stringify(serviceConfig)}`)
     const io = SocketIo(container.webServer.server)
 
     if (_.isArray(serviceConfig.wsServer.topics.inbound)) {
@@ -121,21 +121,21 @@ const startup = (container, next) => {
     }
 
     io.on('connection', (socket) => {
-        container.logger.info(`wsServer: Client ${socket.client.id} connected`)
+        container.logger.debug(`wsServer: Client ${socket.client.id} connected`)
 
         if (_.isArray(serviceConfig.wsServer.topics.outbound)) {
             _.map(serviceConfig.wsServer.topics.outbound, setupOutboundTopic(container, socket))
         }
 
         socket.on('disconnect', () => {
-            container.logger.info(`wsServer: Client ${socket.client.id} disconnected`)
+            container.logger.debug(`wsServer: Client ${socket.client.id} disconnected`)
         })
     })
     io.on('error', (err) => {
         container.logger.error('wsServer: Server ERROR:', err)
     })
     io.on('disconnection', (reason) => {
-        container.logger.info('wsServer: Server DISCONNECTION:', reason)
+        container.logger.debug('wsServer: Server DISCONNECTION:', reason)
     })
 
     // Call next setup function with the context extension
@@ -160,8 +160,8 @@ const startup = (container, next) => {
  * @function
  */
 const shutdown = (container, next) => {
-    container.logger.info('wsServer: Shut down wsServer adapter')
-    container.logger.info('wsServer: Close wsServer')
+    container.logger.info('wsServer: Shutting down wsServer adapter')
+    container.logger.debug('wsServer: Close wsServer')
     container.wsServer.server.close((err) => next(err, null))
 }
 

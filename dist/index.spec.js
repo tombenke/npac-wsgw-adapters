@@ -80,10 +80,9 @@ describe('wsServer', function () {
         var testJob = function testJob(container, next) {
             var wsServerUri = 'http://localhost:' + config.webServer.port;
             var topic = 'IN';
-            var message = { note: 'text...', number: 42, floatValue: 42.24
+            var message = { note: 'text...', number: 42, floatValue: 42.24 };
 
-                // Subscribe to the 'IN' channel to catch the message
-            };container.logger.info('test: consumerClient connects to ' + wsServerUri);
+            container.logger.info('test: consumerClient connects to ' + wsServerUri);
             var consumerClient = (0, _socket2.default)(wsServerUri, { reconnection: false });
             consumerClient.on('connect', function () {
                 container.logger.info('test: consumerClient is connected to ' + wsServerUri);
@@ -95,7 +94,6 @@ describe('wsServer', function () {
                 });
 
                 container.logger.info('test: producerClient sends data: ' + JSON.stringify(message) + ' to NATS(' + topic + ')');
-                //container.pdms.act(msgToForward)
                 container.pdms.publish(topic, JSON.stringify(message));
             });
         };
@@ -144,7 +142,6 @@ describe('wsServer', function () {
 
             setupNatsShortCircuit(container, inTopic, outTopic);
 
-            // Subscribe to the 'IN' channel to catch the loopback response
             container.logger.info('test: consumerClient connects to ' + serverUri);
             var consumerClient = (0, _socket2.default)(serverUri);
             consumerClient.on('connect', function () {
