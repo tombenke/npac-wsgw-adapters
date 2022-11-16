@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import sinon from 'sinon'
 import _ from 'lodash'
 import defaults from './config'
-import pdms from 'npac-pdms-hemera-adapter'
+import nats from 'npac-nats-adapter'
 import webServer from 'npac-webserver-adapter'
 import wsServer from './index'
 import { addLogger, mergeConfig, removeSignalHandlers, catchExitSignals, npacStart } from 'npac'
@@ -27,19 +27,19 @@ describe('wsServer', () => {
         defaults,
         webServer.defaults,
         _.setWith({}, 'webServer.restApiPath', __dirname + '/fixtures/api.yml'),
-        _.setWith({}, 'pdms.natsUri', 'nats://localhost:4222'),
-        _.setWith({}, 'pdms.timeout', 2000)
+        _.setWith({}, 'nats.servers', ['nats://localhost:4222']),
+        _.setWith({}, 'nats.timeout', 2000)
     )
 
-    const makeAdapters = (config) => [mergeConfig(config), addLogger, pdms.startup, webServer.startup, wsServer.startup]
-    const terminators = [wsServer.shutdown, webServer.shutdown, pdms.shutdown]
+    const makeAdapters = (config) => [mergeConfig(config), addLogger, nats.startup, webServer.startup, wsServer.startup]
+    const terminators = [wsServer.shutdown, webServer.shutdown, nats.shutdown]
 
     const setupNatsShortCircuit = (container, inTopic, outTopic) => {
         container.logger.info(`test: NATS client short-circuit sets up observer to NATS(${outTopic})`)
-        container.pdms.subscribe(outTopic, (data) => {
+        container.nats.subscribe(outTopic, (err, data, headers) => {
             container.logger.info(`test: NatsShortCircuit receives from NATS(${outTopic}) data: ${data}`)
             container.logger.info(`test: NatsShortCircuit sends data: ${data} to NATS(${inTopic})`)
-            container.pdms.publish(inTopic, data)
+            container.nats.publish(inTopic, data)
         })
     }
 
@@ -75,7 +75,7 @@ describe('wsServer', () => {
                 })
 
                 container.logger.info(`test: producerClient sends data: ${JSON.stringify(message)} to NATS(${topic})`)
-                container.pdms.publish(topic, JSON.stringify(message))
+                container.nats.publish(topic, JSON.stringify(message))
             })
         }
 
@@ -92,7 +92,7 @@ describe('wsServer', () => {
             const message = { note: 'text...', number: 42, floatValue: 42.24 }
 
             container.logger.info(`test: consumerClient subscribes to NATS(${topic})`)
-            container.pdms.subscribe(topic, (data) => {
+            container.nats.subscribe(topic, (err, data, headers) => {
                 container.logger.info(`test: consumerClient received data: ${JSON.stringify(data)} from NATS(${topic})`)
                 expect(JSON.parse(data)).to.eql(message)
                 next(null, null)

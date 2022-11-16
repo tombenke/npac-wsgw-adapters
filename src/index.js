@@ -20,17 +20,13 @@ const setupInboundTopic = (container, server) => (topic) => {
     container.logger.debug(
         `wsServer: setupInboundTopic adds NATS topic observer to inbound NATS(${topic}) topic to forward to WS(${topic}) events`
     )
-    //container.pdms.add({ pubsub$: true, topic: topic }, (data) => {
-    container.pdms.subscribe(topic, (data) => {
+    //container.nats.add({ pubsub$: true, topic: topic }, (data) => {
+    container.nats.subscribe(topic, (err, payload, headers) => {
+        container.logger.debug(`wsServer: Inbound NATS topic observer received payload: ${payload} from NATS(${topic})`)
         container.logger.debug(
-            `wsServer: Inbound NATS topic observer received data: ${JSON.stringify(data)} from NATS(${topic})`
+            `wsServer: Inbound NATS topic observer forward payload: ${payload} from NATS(${topic}) topic to WS(${topic}) event`
         )
-        container.logger.debug(
-            `wsServer: Inbound NATS topic observer forward data: ${JSON.stringify(
-                data
-            )} from NATS(${topic}) topic to WS(${topic}) event`
-        )
-        server.emit(topic, data)
+        server.emit(topic, payload)
     })
 }
 
@@ -50,52 +46,17 @@ const setupOutboundTopic = (container, server) => (topic) => {
     container.logger.debug(
         `wsServer: setupOutboundTopic adds WS event observer to outbound WS(${topic}) to forward to NATS "${topic}" topic`
     )
-    server.on(topic, (data, confirmCb) => {
-        //const msgToForward = _.merge({}, { pubsub$: true, topic: topic, data: data })
-        //container.logger.debug(
-        //    `wsServer: Outbound WS topic observer forwards data: ${JSON.stringify(
-        //        msgToForward
-        //    )} from WS(${topic}) event to NATS(${topic}) topic`
-        //)
-        //container.pdms.act(msgToForward)
+    server.on(topic, (payload, confirmCb) => {
         container.logger.debug(
-            `wsServer: Outbound WS topic observer forwards data: ${JSON.stringify(
-                data
-            )} from WS(${topic}) event to NATS(${topic}) topic`
+            `wsServer: Outbound WS topic observer forwards data: ${payload} from WS(${topic}) event to NATS(${topic}) topic`
         )
-        container.pdms.publish(topic, data)
+        container.nats.publish(topic, payload)
 
         if (_.isFunction(confirmCb)) {
             confirmCb(true)
         }
     })
 }
-
-/**
- * Setup observers to the inbound topics, as well as producers to the outbound topics
- *
- * Get the topic names for the inbound topics, then create PDMS subscribers,
- * that receives the messages coming from the NATS messaging middleware of the given topic
- * then forwards them to the websocket channel with the same event name.
- * Do the same for the outbound topics, but the opposite direction, observing the websocket events
- * then publishing towards the corresponding NATS topic.
- *
- * @arg {Object} container  - The container object
- * @arg {Object} socket - The socket the server communicates with the connected client through
- * @arg {Object} topics - The object, which holds two arrays of topic names, one for the `inbound` topics, and one for the `outbound` ones.
- *
- * @function
-const setupTopics = (container, server, topics) => {
-    container.logger.debug(`wsServer: setupTopics topics:${JSON.stringify(topics)}`)
-    if (_.isArray(topics.inbound)) {
-        _.map(topics.inbound, setupInboundTopic(container, server))
-    }
-
-    if (_.isArray(topics.outbound)) {
-        _.map(topics.outbound, setupOutboundTopic(container, server))
-    }
-}
- */
 
 /**
  * The startup function of the adapter

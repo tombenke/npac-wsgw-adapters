@@ -14,10 +14,10 @@ module.exports = {
     wsServer: {
         topics: {
             // The list of inbound NATS topic names
-            inbound: getTopicArray(process.env.WSPDMSGW_INBOUND_TOPICS),
+            inbound: getTopicArray(process.env.WSGW_INBOUND_TOPICS),
 
             // The list of outbound NATS topic names
-            outbound: getTopicArray(process.env.WSPDMSGW_OUTBOUND_TOPICS)
+            outbound: getTopicArray(process.env.WSGW_OUTBOUND_TOPICS)
         }
     }
 }

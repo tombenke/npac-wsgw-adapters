@@ -14,9 +14,9 @@ var _config = require('./config');
 
 var _config2 = _interopRequireDefault(_config);
 
-var _npacPdmsHemeraAdapter = require('npac-pdms-hemera-adapter');
+var _npacNatsAdapter = require('npac-nats-adapter');
 
-var _npacPdmsHemeraAdapter2 = _interopRequireDefault(_npacPdmsHemeraAdapter);
+var _npacNatsAdapter2 = _interopRequireDefault(_npacNatsAdapter);
 
 var _npacWebserverAdapter = require('npac-webserver-adapter');
 
@@ -48,19 +48,19 @@ describe('wsServer', function () {
         done();
     });
 
-    var defaultConfig = _lodash2.default.merge({}, _config2.default, _npacWebserverAdapter2.default.defaults, _lodash2.default.setWith({}, 'webServer.restApiPath', __dirname + '/fixtures/api.yml'), _lodash2.default.setWith({}, 'pdms.natsUri', 'nats://localhost:4222'), _lodash2.default.setWith({}, 'pdms.timeout', 2000));
+    var defaultConfig = _lodash2.default.merge({}, _config2.default, _npacWebserverAdapter2.default.defaults, _lodash2.default.setWith({}, 'webServer.restApiPath', __dirname + '/fixtures/api.yml'), _lodash2.default.setWith({}, 'nats.servers', ['nats://localhost:4222']), _lodash2.default.setWith({}, 'nats.timeout', 2000));
 
     var makeAdapters = function makeAdapters(config) {
-        return [(0, _npac.mergeConfig)(config), _npac.addLogger, _npacPdmsHemeraAdapter2.default.startup, _npacWebserverAdapter2.default.startup, _index2.default.startup];
+        return [(0, _npac.mergeConfig)(config), _npac.addLogger, _npacNatsAdapter2.default.startup, _npacWebserverAdapter2.default.startup, _index2.default.startup];
     };
-    var terminators = [_index2.default.shutdown, _npacWebserverAdapter2.default.shutdown, _npacPdmsHemeraAdapter2.default.shutdown];
+    var terminators = [_index2.default.shutdown, _npacWebserverAdapter2.default.shutdown, _npacNatsAdapter2.default.shutdown];
 
     var setupNatsShortCircuit = function setupNatsShortCircuit(container, inTopic, outTopic) {
         container.logger.info('test: NATS client short-circuit sets up observer to NATS(' + outTopic + ')');
-        container.pdms.subscribe(outTopic, function (data) {
+        container.nats.subscribe(outTopic, function (err, data, headers) {
             container.logger.info('test: NatsShortCircuit receives from NATS(' + outTopic + ') data: ' + data);
             container.logger.info('test: NatsShortCircuit sends data: ' + data + ' to NATS(' + inTopic + ')');
-            container.pdms.publish(inTopic, data);
+            container.nats.publish(inTopic, data);
         });
     };
 
@@ -94,7 +94,7 @@ describe('wsServer', function () {
                 });
 
                 container.logger.info('test: producerClient sends data: ' + JSON.stringify(message) + ' to NATS(' + topic + ')');
-                container.pdms.publish(topic, JSON.stringify(message));
+                container.nats.publish(topic, JSON.stringify(message));
             });
         };
 
@@ -111,7 +111,7 @@ describe('wsServer', function () {
             var message = { note: 'text...', number: 42, floatValue: 42.24 };
 
             container.logger.info('test: consumerClient subscribes to NATS(' + topic + ')');
-            container.pdms.subscribe(topic, function (data) {
+            container.nats.subscribe(topic, function (err, data, headers) {
                 container.logger.info('test: consumerClient received data: ' + JSON.stringify(data) + ' from NATS(' + topic + ')');
                 (0, _chai.expect)(JSON.parse(data)).to.eql(message);
                 next(null, null);

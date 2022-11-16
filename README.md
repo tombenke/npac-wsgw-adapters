@@ -13,7 +13,7 @@ These adapters are the main parts of the [wsgw](https://github.com/tombenke/wsgw
 
 You can add these adapters to your [npac](http://tombenke.github.io/npac)-based application, but in case you need an off-the-shelf web server with WebSocket that also includes these adapters,and provides the NATS gateway functionality as well, then use [easer](https://www.npmjs.com/package/easer) instead.
 
-The applications that use this adapter, also needs to [npac-pdms-hemera-adapter](https://github.com/tombenke/npac-pdms-hemera-adapter) and [npac-webserver-adapter](https://github.com/tombenke/npac-webserver-adapter/) adapters added to the application container.
+The applications that use this adapter, also needs to [npac-nats-adapter](https://github.com/tombenke/npac-nats-adapter) and [npac-webserver-adapter](https://github.com/tombenke/npac-webserver-adapter/) adapters added to the application container.
 
 To learn more about the functions visit the [API docs](https://tombenke.github.io/npac-wsgw-adapters/api/).
 See also the test cases in [`src/index.spec.js`](src/index.spec.js) as examples of how to configure and use the module.
@@ -63,7 +63,7 @@ The default parameters can be found in the [`config.js`](https://github.com/tomb
 
 - [wsgw](https://github.com/tombenke/wsgw)
 - [npac](http://tombenke.github.io/npac)
-- [npac-pdms-hemera-adapter](https://github.com/tombenke/npac-pdms-hemera-adapter)
+- [npac-nats-adapter](https://github.com/tombenke/npac-nats-adapter)
 - [npac-webserver-adapter](https://github.com/tombenke/npac-webserver-adapter/)
 
 ---
