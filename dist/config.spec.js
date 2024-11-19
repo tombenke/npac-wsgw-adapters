@@ -1,6 +1,8 @@
 'use strict';
 
-var _chai = require('chai');
+var _expect = require('expect');
+
+var _expect2 = _interopRequireDefault(_expect);
 
 var _config = require('./config');
 
@@ -27,7 +29,7 @@ describe('wsServer.config', function () {
         };
 
         var defaults = _config2.default;
-        (0, _chai.expect)(defaults).to.eql(expected);
+        (0, _expect2.default)(defaults).toEqual(expected);
         done();
     });
 });

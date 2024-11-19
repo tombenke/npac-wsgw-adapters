@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import expect from 'expect'
 import config from './config'
 
 before((done) => {
@@ -20,7 +20,7 @@ describe('wsServer.config', () => {
         }
 
         const defaults = config
-        expect(defaults).to.eql(expected)
+        expect(defaults).toEqual(expected)
         done()
     })
 })

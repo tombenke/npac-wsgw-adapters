@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import expect from 'expect'
 import sinon from 'sinon'
 import _ from 'lodash'
 import defaults from './config'
@@ -44,12 +44,12 @@ describe('wsServer', () => {
     }
 
     it('#wsServer check setup', (done) => {
-        expect(wsServer.defaults.wsServer.topics.inbound).to.eql([])
-        expect(wsServer.defaults.wsServer.topics.outbound).to.eql([])
-        expect(wsServer).to.have.property('startup')
-        expect(wsServer.startup).to.be.a('function')
-        expect(wsServer).to.have.property('shutdown')
-        expect(wsServer.shutdown).to.be.a('function')
+        expect(wsServer.defaults.wsServer.topics.inbound).toEqual([])
+        expect(wsServer.defaults.wsServer.topics.outbound).toEqual([])
+        expect(wsServer).toHaveProperty('startup')
+        expect(typeof wsServer.startup).toBe('function')
+        expect(wsServer).toHaveProperty('shutdown')
+        expect(typeof wsServer.shutdown).toBe('function')
         done()
     })
 
@@ -70,7 +70,7 @@ describe('wsServer', () => {
                     container.logger.info(
                         `test: consumerClient received data: ${JSON.stringify(data)} from WS(${topic})`
                     )
-                    expect(JSON.parse(data)).to.eql(message)
+                    expect(JSON.parse(data)).toEqual(message)
                     next(null, null)
                 })
 
@@ -94,7 +94,7 @@ describe('wsServer', () => {
             container.logger.info(`test: consumerClient subscribes to NATS(${topic})`)
             container.nats.subscribe(topic, (err, data, headers) => {
                 container.logger.info(`test: consumerClient received data: ${JSON.stringify(data)} from NATS(${topic})`)
-                expect(JSON.parse(data)).to.eql(message)
+                expect(JSON.parse(data)).toEqual(message)
                 next(null, null)
             })
 
@@ -130,7 +130,7 @@ describe('wsServer', () => {
                 container.logger.info(`test: consumerClient subscribes to WS(${inTopic}) events`)
                 consumerClient.on(inTopic, function (data) {
                     container.logger.info(`test: consumerClient received data: ${data} from WS(${inTopic})`)
-                    expect(JSON.parse(data)).to.eql(inMessage)
+                    expect(JSON.parse(data)).toEqual(inMessage)
                     producerClient.close()
                     consumerClient.close()
                     next(null, null)

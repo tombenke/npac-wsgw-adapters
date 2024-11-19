@@ -1,6 +1,10 @@
 'use strict';
 
-var _chai = require('chai');
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _expect = require('expect');
+
+var _expect2 = _interopRequireDefault(_expect);
 
 var _sinon = require('sinon');
 
@@ -65,12 +69,12 @@ describe('wsServer', function () {
     };
 
     it('#wsServer check setup', function (done) {
-        (0, _chai.expect)(_index2.default.defaults.wsServer.topics.inbound).to.eql([]);
-        (0, _chai.expect)(_index2.default.defaults.wsServer.topics.outbound).to.eql([]);
-        (0, _chai.expect)(_index2.default).to.have.property('startup');
-        (0, _chai.expect)(_index2.default.startup).to.be.a('function');
-        (0, _chai.expect)(_index2.default).to.have.property('shutdown');
-        (0, _chai.expect)(_index2.default.shutdown).to.be.a('function');
+        (0, _expect2.default)(_index2.default.defaults.wsServer.topics.inbound).toEqual([]);
+        (0, _expect2.default)(_index2.default.defaults.wsServer.topics.outbound).toEqual([]);
+        (0, _expect2.default)(_index2.default).toHaveProperty('startup');
+        (0, _expect2.default)(_typeof(_index2.default.startup)).toBe('function');
+        (0, _expect2.default)(_index2.default).toHaveProperty('shutdown');
+        (0, _expect2.default)(_typeof(_index2.default.shutdown)).toBe('function');
         done();
     });
 
@@ -89,7 +93,7 @@ describe('wsServer', function () {
                 container.logger.info('test: consumerClient subscribes to WS(' + topic + ') events');
                 consumerClient.on(topic, function (data) {
                     container.logger.info('test: consumerClient received data: ' + JSON.stringify(data) + ' from WS(' + topic + ')');
-                    (0, _chai.expect)(JSON.parse(data)).to.eql(message);
+                    (0, _expect2.default)(JSON.parse(data)).toEqual(message);
                     next(null, null);
                 });
 
@@ -113,7 +117,7 @@ describe('wsServer', function () {
             container.logger.info('test: consumerClient subscribes to NATS(' + topic + ')');
             container.nats.subscribe(topic, function (err, data, headers) {
                 container.logger.info('test: consumerClient received data: ' + JSON.stringify(data) + ' from NATS(' + topic + ')');
-                (0, _chai.expect)(JSON.parse(data)).to.eql(message);
+                (0, _expect2.default)(JSON.parse(data)).toEqual(message);
                 next(null, null);
             });
 
@@ -149,7 +153,7 @@ describe('wsServer', function () {
                 container.logger.info('test: consumerClient subscribes to WS(' + inTopic + ') events');
                 consumerClient.on(inTopic, function (data) {
                     container.logger.info('test: consumerClient received data: ' + data + ' from WS(' + inTopic + ')');
-                    (0, _chai.expect)(JSON.parse(data)).to.eql(inMessage);
+                    (0, _expect2.default)(JSON.parse(data)).toEqual(inMessage);
                     producerClient.close();
                     consumerClient.close();
                     next(null, null);
